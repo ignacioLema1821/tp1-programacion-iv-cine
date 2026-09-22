@@ -1,59 +1,78 @@
-# CineApp
+# CineApp — Programación IV
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.8.
+Trabajo práctico de desarrollo de una aplicación para un cine.
 
-## Development server
+Estado: en desarrollo.
 
-To start a local development server, run:
+## Tecnologías
 
-```bash
-ng serve
-```
+- Angular con componentes standalone.
+- TypeScript.
+- CSS.
+- Supabase como base de datos.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Funcionalidades implementadas
 
-## Code scaffolding
+- Cartelera conectada a Supabase.
+- Búsqueda de películas por nombre.
+- Filtro por género.
+- Combinación de búsqueda y filtro.
+- Mensajes de carga y manejo de errores.
+- Botón para reintentar la carga.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Arquitectura
 
-```bash
-ng generate component component-name
-```
+La aplicación está organizada en:
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- pages: componentes de las pantallas.
+- models: interfaces que definen la estructura de los datos.
+- services: acceso a los datos y conexión con Supabase.
+- environments: configuración de conexión.
 
-```bash
-ng generate --help
-```
+El componente Cartelera solicita los datos a PeliculasService.
+Este servicio utiliza SupabaseService para consultar la base de datos.
 
-## Building
+## Base de datos
 
-To build the project run:
+Se utilizan las tablas:
 
-```bash
-ng build
-```
+- peliculas
+- generos
+- peliculas_generos
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+La tabla peliculas_generos permite relacionar varias películas
+con varios géneros.
 
-## Running unit tests
+Las tablas tienen RLS activado y políticas de lectura para
+visitantes y usuarios autenticados.
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Decisiones técnicas
 
-```bash
-ng test
-```
+- Se utilizaron componentes standalone.
+- Se separó la presentación del acceso a los datos mediante servicios.
+- Se definió la interfaz Pelicula para describir los datos utilizados.
+- Se usó una tabla intermedia para la relación entre películas y géneros.
+- Se utilizaron signals para actualizar la pantalla al recibir los datos.
+- Se incluyeron estados de carga y error en las consultas.
 
-## Running end-to-end tests
+## Ejecución local
 
-For end-to-end (e2e) testing, run:
+1. Instalar las dependencias con `npm install`.
+2. Configurar la URL y la clave pública de Supabase en
+   `src/environments/environment.ts`.
+3. Ejecutar `npx ng serve`.
+4. Abrir http://localhost:4200.
 
-```bash
-ng e2e
-```
+La base de datos debe tener las tablas, relaciones y permisos indicados.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Próximos pasos
 
-## Additional Resources
+- Navegación entre pantallas.
+- Registro e inicio de sesión.
+- Roles y administración.
+- Salas, funciones y selección de butacas.
+- Compras y demás funcionalidades del enunciado.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Publicación
+
+Pendiente.

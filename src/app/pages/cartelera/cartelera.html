@@ -1,0 +1,66 @@
+<section>
+  <h2>Cartelera</h2>
+  <p>Elegí tu próxima película.</p>
+
+  @if (cargando()) {
+    <p role="status">Cargando películas...</p>
+  } @else if (mensajeError()) {
+    <div role="alert">
+      <p>{{ mensajeError() }}</p>
+
+      <button type="button" (click)="cargarPeliculas()">
+        Reintentar
+      </button>
+    </div>
+  } @else {
+    <div class="filtros">
+      <div class="campo">
+        <label for="busqueda">Buscar por nombre</label>
+
+        <input
+          id="busqueda"
+          type="search"
+          placeholder="Ejemplo: Coco"
+          [(ngModel)]="busqueda"
+        />
+      </div>
+
+      <div class="campo">
+        <label for="genero">Filtrar por género</label>
+
+        <select id="genero" [(ngModel)]="generoSeleccionado">
+          <option value="">Todos los géneros</option>
+
+          @for (genero of generosDisponibles; track genero) {
+            <option [value]="genero">{{ genero }}</option>
+          }
+        </select>
+      </div>
+
+      <button type="button" (click)="limpiarFiltros()">
+        Limpiar filtros
+      </button>
+    </div>
+
+    <p class="resultados" role="status">
+      Películas encontradas: {{ peliculasFiltradas.length }}
+    </p>
+
+    <div class="peliculas">
+      @for (pelicula of peliculasFiltradas; track pelicula.id) {
+        <article class="pelicula">
+          <h3>{{ pelicula.nombre }}</h3>
+
+          <p class="detalle">
+            {{ pelicula.generos.join(' · ') }}
+            — {{ pelicula.duracion }} minutos
+          </p>
+
+          <p>{{ pelicula.sinopsis }}</p>
+        </article>
+      } @empty {
+        <p>No encontramos películas con esos filtros.</p>
+      }
+    </div>
+  }
+</section>

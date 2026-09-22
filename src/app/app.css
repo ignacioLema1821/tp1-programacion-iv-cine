@@ -1,0 +1,28 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #101018;
+  color: #f5f5fa;
+  font-family: Arial, sans-serif;
+}
+
+.inicio {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+
+h1 {
+  margin-top: 0;
+  color: #a99bff;
+  font-size: 48px;
+}
+
+h2 {
+  margin-top: 48px;
+}
+
+p {
+  color: #c4c4d4;
+  line-height: 1.6;
+}
