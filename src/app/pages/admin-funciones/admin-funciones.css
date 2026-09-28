@@ -1,0 +1,244 @@
+/* El componente ocupa el espacio disponible dentro de la página. */
+:host {
+  display: block;
+  min-width: 0;
+}
+
+section {
+  width: 100%;
+  min-width: 0;
+  color: #f5f5fa;
+}
+
+h2 {
+  color: #a99bff;
+}
+
+h3 {
+  margin: 28px 0 16px;
+}
+
+p {
+  line-height: 1.5;
+}
+
+/* El ancho incluye el relleno y el borde del formulario. */
+form {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 750px;
+  margin: 24px 0 32px;
+  padding: 24px;
+  border: 1px solid #39394d;
+  border-radius: 16px;
+  background: #1d1d2b;
+}
+
+form h3 {
+  margin-top: 0;
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+label {
+  display: block;
+  margin: 16px 0 8px;
+}
+
+input,
+select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #686880;
+  border-radius: 8px;
+  background: #101018;
+  color: #f5f5fa;
+  font: inherit;
+  color-scheme: dark;
+}
+
+/* Los campos se ubican juntos si hay espacio y se apilan si falta. */
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.campo {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+/* Estilo común: cada grupo decide la separación de sus botones. */
+button {
+  margin: 0;
+  padding: 12px 20px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #a99bff;
+  color: #101018;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* El espacio superior se aplica solamente al botón del formulario. */
+.acciones-formulario {
+  margin-top: 24px;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible,
+.tabla-contenedor:focus-visible {
+  outline: 2px solid #a99bff;
+  outline-offset: 3px;
+}
+
+/* El borde y el fondo distinguen la confirmación del resto. */
+.confirmacion {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 20px 0 28px;
+  padding: 24px;
+  border: 1px solid #97505d;
+  border-radius: 16px;
+  background: #2b1d27;
+}
+
+.confirmacion h3 {
+  margin: 0 0 12px;
+  color: #ffb4b4;
+}
+
+.confirmacion p {
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+
+/* gap separa los botones sin agregarles márgenes individuales. */
+.acciones-confirmacion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.boton-peligro {
+  background: #ffb4b4;
+  color: #42151d;
+}
+
+.boton-secundario {
+  border-color: #79798f;
+  background: transparent;
+  color: #f5f5fa;
+}
+
+/* El botón de la tabla es más compacto que el de confirmación. */
+.boton-eliminar {
+  padding: 9px 14px;
+  border-color: #97505d;
+  background: transparent;
+  color: #ffb4b4;
+}
+
+/* La tabla mantiene sus columnas dentro de un área desplazable. */
+.tabla-contenedor {
+  width: 100%;
+  margin-top: 20px;
+  overflow-x: auto;
+  border: 1px solid #39394d;
+  border-radius: 12px;
+  background: #1d1d2b;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+caption {
+  padding: 16px;
+  text-align: left;
+  font-weight: bold;
+}
+
+th,
+td {
+  padding: 16px;
+  border-bottom: 1px solid #39394d;
+  text-align: left;
+  vertical-align: middle;
+}
+
+/* Evita que los títulos y las fechas se corten en varias líneas. */
+th,
+td:nth-child(3),
+td:nth-child(4),
+td:nth-child(5) {
+  white-space: nowrap;
+}
+
+th {
+  background: #292939;
+  color: #c6bcff;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.error,
+.exito {
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.error {
+  background: #351f29;
+  color: #ffb4b4;
+}
+
+.exito {
+  background: #1c3027;
+  color: #a7efbb;
+}
+
+/* En celulares reducimos el relleno y ampliamos los botones. */
+@media (max-width: 600px) {
+  form,
+  .confirmacion {
+    padding: 16px;
+  }
+
+  .acciones-confirmacion {
+    flex-direction: column;
+  }
+
+  .acciones-confirmacion button,
+  .acciones-formulario button {
+    width: 100%;
+  }
+}

@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Pelicula } from '../models/pelicula';
+import { Genero } from '../models/genero';
 import { SupabaseService } from './supabase.service';
 
 @Injectable({
@@ -7,6 +8,19 @@ import { SupabaseService } from './supabase.service';
 })
 export class PeliculasService {
   private supabaseService = inject(SupabaseService);
+
+  async obtenerGeneros(): Promise<Genero[]> {
+    const respuesta = await this.supabaseService.cliente
+      .from('generos')
+      .select('id, nombre')
+      .order('nombre');
+
+    if (respuesta.error) {
+      throw respuesta.error;
+    }
+
+    return respuesta.data;
+  }
 
   async obtenerPeliculas(): Promise<Pelicula[]> {
     const respuestaPeliculas = await this.supabaseService.cliente
@@ -18,13 +32,7 @@ export class PeliculasService {
       throw respuestaPeliculas.error;
     }
 
-    const respuestaGeneros = await this.supabaseService.cliente
-      .from('generos')
-      .select('id, nombre');
-
-    if (respuestaGeneros.error) {
-      throw respuestaGeneros.error;
-    }
+    const generos = await this.obtenerGeneros();
 
     const respuestaRelaciones = await this.supabaseService.cliente
       .from('peliculas_generos')
@@ -37,16 +45,18 @@ export class PeliculasService {
     const peliculas: Pelicula[] = [];
 
     for (const datosPelicula of respuestaPeliculas.data) {
-      const generosPelicula: string[] = [];
+      const nombresGeneros: string[] = [];
+      const idsGeneros: number[] = [];
 
       for (const relacion of respuestaRelaciones.data) {
         if (relacion.pelicula_id === datosPelicula.id) {
-          const genero = respuestaGeneros.data.find(
+          const genero = generos.find(
             genero => genero.id === relacion.genero_id
           );
 
           if (genero) {
-            generosPelicula.push(genero.nombre);
+            nombresGeneros.push(genero.nombre);
+            idsGeneros.push(genero.id);
           }
         }
       }
@@ -56,12 +66,37 @@ export class PeliculasService {
         nombre: datosPelicula.nombre,
         duracion: datosPelicula.duracion,
         sinopsis: datosPelicula.sinopsis,
-        generos: generosPelicula
+        generos: nombresGeneros,
+        generoIds: idsGeneros
       };
 
       peliculas.push(pelicula);
     }
 
     return peliculas;
+  }
+
+  async guardarPelicula(
+    id: number | null,
+    nombre: string,
+    duracion: number,
+    sinopsis: string,
+    generoIds: number[]
+  ): Promise<void> {
+    // rpc permite ejecutar la función que creamos en PostgreSQL.
+    const respuesta = await this.supabaseService.cliente.rpc(
+      'guardar_pelicula',
+      {
+        p_id: id,
+        p_nombre: nombre,
+        p_duracion: duracion,
+        p_sinopsis: sinopsis,
+        p_generos: generoIds
+      }
+    );
+
+    if (respuesta.error) {
+      throw respuesta.error;
+    }
   }
 }

@@ -2,6 +2,7 @@ h2 {
   margin-top: 48px;
 }
 
+/* Los filtros pasan a otra fila si el ancho no alcanza. */
 .filtros {
   display: flex;
   flex-wrap: wrap;
@@ -20,6 +21,7 @@ label {
   margin-bottom: 8px;
 }
 
+/* Compartimos el aspecto de los campos de búsqueda y selección. */
 input,
 select {
   box-sizing: border-box;
@@ -51,6 +53,7 @@ button:hover {
   background: #c0b5ff;
 }
 
+/* Hace visible dónde está el foco al navegar con el teclado. */
 input:focus-visible,
 select:focus-visible,
 button:focus-visible {
@@ -63,6 +66,7 @@ button:focus-visible {
   color: #c4c4d4;
 }
 
+/* La grilla adapta la cantidad de columnas al ancho disponible. */
 .peliculas {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
@@ -91,3 +95,4 @@ button:focus-visible {
   color: #a99bff;
   font-size: 14px;
 }
+

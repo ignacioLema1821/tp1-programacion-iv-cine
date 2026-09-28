@@ -1,0 +1,81 @@
+.registro { 
+  max-width: 560px; /* Evita que los campos sean demasiado anchos. */
+  margin: 0 auto; /* Centra el contenido. */
+} 
+
+form { 
+  margin-top: 24px; /* Lo separa de la presentación. */
+  padding: 24px; /* Agrega espacio interior. */
+  border: 1px solid #39394d; /* Dibuja un borde discreto. */
+  border-radius: 16px; /* Redondea las esquinas. */
+  background: #1d1d2b; /* Define el fondo del formulario. */
+} 
+
+fieldset { 
+  min-width: 0; /* Permite que se reduzca en pantallas pequeñas. */
+  margin: 0; /* Quita el margen predeterminado. */
+  padding: 0; /* Quita el espacio interior predeterminado. */
+  border: 0; /* Quita el borde predeterminado. */
+} 
+
+legend { 
+  margin-bottom: 8px; /* Lo separa de los campos. */
+  font-weight: bold; /* Resalta el texto. */
+} 
+
+label { 
+  display: block; /* Ubica cada etiqueta en su propia línea. */
+  margin-top: 18px; /* La separa del campo anterior. */
+  margin-bottom: 8px; /* La separa de su campo. */
+} 
+
+input, select { 
+  box-sizing: border-box; /* Incluye borde y padding dentro del ancho. */
+  width: 100%; /* Ocupa todo el ancho disponible. */
+  padding: 12px; /* Agrega espacio interior. */
+  border: 1px solid #686880; /* Define el borde. */
+  border-radius: 8px; /* Redondea las esquinas. */
+  background: #101018; /* Define el fondo de los campos. */
+  color: #f5f5fa; /* Define el color del texto. */
+  font: inherit; /* Utiliza la tipografía de la página. */
+  color-scheme: dark; /* Sugiere una apariencia oscura para controles nativos. */
+} 
+
+small { 
+  display: block; /* Lo coloca en una línea propia. */
+  margin-top: 8px; /* Lo separa del campo. */
+  color: #c4c4d4; /* Usa un color secundario. */
+} 
+
+button { 
+  width: 100%; /* Ocupa todo el ancho. */
+  margin-top: 24px; /* Lo separa de los campos. */
+  padding: 12px; /* Amplía su área interior. */
+  border: 0; /* Quita el borde predeterminado. */
+  border-radius: 8px; /* Redondea las esquinas. */
+  background: #a99bff; /* Utiliza el color destacado. */
+  color: #101018; /* Da contraste al texto. */
+  font: inherit; /* Utiliza la tipografía de la página. */
+  font-weight: bold; /* Resalta el texto del botón. */
+  cursor: pointer; /* Indica que se puede presionar. */
+} 
+
+button:disabled { 
+  opacity: 0.6; /* Reduce su intensidad visual. */
+  cursor: wait; /* Indica que hay una operación en curso. */
+} 
+
+input:focus-visible, select:focus-visible, button:focus-visible { /* Identifica el control enfocado con el teclado. */
+  outline: 2px solid #a99bff; /* Dibuja un contorno visible. */
+  outline-offset: 3px; /* Separa el contorno del control. */
+} 
+
+.error { 
+  color: #ffb4b4; /* Usa un rojo claro legible sobre el fondo. */
+  line-height: 1.5; /* Facilita la lectura. */
+} 
+
+.exito { 
+  color: #a7efbb; /* Usa un verde claro. */
+  line-height: 1.5; /* Facilita la lectura. */
+} 

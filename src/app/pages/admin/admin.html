@@ -1,0 +1,133 @@
+<section>
+  <h2>Administración de películas</h2>
+
+  @if (mensajeExito()) {
+    <p class="exito" role="status">{{ mensajeExito() }}</p>
+  }
+
+  @if (cargando()) {
+    <p role="status">Cargando datos...</p>
+  } @else if (errorCarga()) {
+    <div role="alert">
+      <p class="error">{{ errorCarga() }}</p>
+
+      <button type="button" (click)="cargarDatos()">
+        Reintentar
+      </button>
+    </div>
+  } @else {
+    <form #formulario="ngForm" (ngSubmit)="guardarPelicula(formulario)">
+      <h3>
+        {{ peliculaEditandoId === null ? 'Nueva película' : 'Editar película' }}
+      </h3>
+
+      <fieldset [disabled]="guardando()">
+        <legend>Datos de la película</legend>
+
+        <label for="nombre">Nombre</label>
+        <input
+          id="nombre"
+          name="nombre"
+          type="text"
+          [(ngModel)]="datos.nombre"
+          required
+        />
+
+        <label for="duracion">Duración en minutos</label>
+        <input
+          id="duracion"
+          name="duracion"
+          type="number"
+          min="1"
+          step="1"
+          [(ngModel)]="datos.duracion"
+          required
+        />
+
+        <label for="sinopsis">Sinopsis</label>
+        <textarea
+          id="sinopsis"
+          name="sinopsis"
+          rows="4"
+          [(ngModel)]="datos.sinopsis"
+          required
+        ></textarea>
+
+        <fieldset class="generos">
+          <legend>Géneros: seleccioná al menos uno</legend>
+
+          @for (genero of generos(); track genero.id) {
+            <label class="opcion-genero">
+              <input
+                type="checkbox"
+                [checked]="generosSeleccionados.includes(genero.id)"
+                (change)="cambiarGenero(genero.id)"
+              />
+              {{ genero.nombre }}
+            </label>
+          }
+        </fieldset>
+
+        <div class="acciones">
+          <button type="submit" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando...' : 'Guardar película' }}
+          </button>
+
+          <button
+            type="button"
+            class="secundario"
+            (click)="cancelarEdicion(formulario)"
+            [disabled]="guardando()"
+          >
+            {{ peliculaEditandoId === null ? 'Limpiar' : 'Cancelar edición' }}
+          </button>
+        </div>
+      </fieldset>
+
+      @if (mensajeError()) {
+        <p class="error" role="alert">{{ mensajeError() }}</p>
+      }
+    </form>
+
+    <h3>Películas registradas: {{ peliculas().length }}</h3>
+
+    @if (peliculas().length > 0) {
+      <div class="tabla-contenedor">
+        <table>
+          <caption>Listado de películas</caption>
+
+          <thead>
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Duración</th>
+              <th scope="col">Géneros</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (pelicula of peliculas(); track pelicula.id) {
+              <tr>
+                <td>{{ pelicula.nombre }}</td>
+                <td>{{ pelicula.duracion }} minutos</td>
+                <td>{{ pelicula.generos.join(' · ') }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="secundario"
+                    (click)="editarPelicula(pelicula, formulario)"
+                    [disabled]="guardando()"
+                  >
+                    Editar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p>Todavía no hay películas cargadas.</p>
+    }
+  }
+</section>

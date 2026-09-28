@@ -1,6 +1,93 @@
-<main class="inicio">
-  <h1>CineApp</h1>
-  <p>Tu próxima película empieza acá.</p>
+<div class="contenedor">
+  <header>
+    <h1>CineApp</h1>
+    <p>Tu próxima película empieza acá.</p>
 
-  <app-cartelera></app-cartelera>
-</main>
+    <nav aria-label="Navegación principal">
+      <a
+        routerLink="/cartelera"
+        routerLinkActive="activo"
+        ariaCurrentWhenActive="page"
+      >
+        Cartelera
+      </a>
+
+      @if (authService.cargandoSesion()) {
+        <span class="usuario" role="status">
+          Comprobando sesión...
+        </span>
+      } @else {
+        @if (authService.usuario()) {
+          @if (authService.rol() === 'admin') {
+            <a
+              routerLink="/admin"
+              routerLinkActive="activo"
+              [routerLinkActiveOptions]="{ exact: true }"
+              ariaCurrentWhenActive="page"
+            >
+              Películas
+            </a>
+
+            <a
+              routerLink="/admin/funciones"
+              routerLinkActive="activo"
+              ariaCurrentWhenActive="page"
+            >
+              Funciones
+            </a>
+          }
+
+          <span class="usuario">
+            {{ authService.usuario()?.email }}
+          </span>
+
+          @if (authService.cargandoRol()) {
+            <span class="usuario" role="status">
+              Cargando perfil...
+            </span>
+          } @else if (authService.rol()) {
+            <span class="usuario">
+              Rol: {{ authService.rol() }}
+            </span>
+          }
+
+          <button
+            type="button"
+            (click)="cerrarSesion()"
+            [disabled]="cerrandoSesion()"
+          >
+            {{ cerrandoSesion() ? 'Cerrando...' : 'Cerrar sesión' }}
+          </button>
+        } @else {
+          <a
+            routerLink="/registro"
+            routerLinkActive="activo"
+            ariaCurrentWhenActive="page"
+          >
+            Registrarse
+          </a>
+
+          <a
+            routerLink="/login"
+            routerLinkActive="activo"
+            ariaCurrentWhenActive="page"
+          >
+            Iniciar sesión
+          </a>
+        }
+      }
+    </nav>
+
+    @if (mensajeError()) {
+      <p class="error" role="alert">{{ mensajeError() }}</p>
+    }
+
+    @if (authService.errorRol()) {
+      <p class="error" role="alert">{{ authService.errorRol() }}</p>
+    }
+  </header>
+
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+</div>

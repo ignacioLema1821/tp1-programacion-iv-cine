@@ -1,0 +1,146 @@
+h2 {
+  color: #a99bff;
+}
+
+h3 {
+  margin-top: 28px;
+}
+
+p {
+  line-height: 1.5;
+}
+
+form {
+  margin: 24px 0;
+  padding: 24px;
+  border: 1px solid #39394d;
+  border-radius: 16px;
+  background: #1d1d2b;
+}
+
+form h3 {
+  margin-top: 0;
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+label {
+  display: block;
+  margin: 16px 0 8px;
+}
+
+input:not([type="checkbox"]),
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #686880;
+  border-radius: 8px;
+  background: #101018;
+  color: #f5f5fa;
+  font: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* Las opciones de género pueden distribuirse en varias filas. */
+.generos {
+  margin-top: 24px;
+}
+
+.opcion-genero {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 20px 8px 0;
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #a99bff;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+button {
+  padding: 12px 18px;
+  border: 1px solid #a99bff;
+  border-radius: 8px;
+  background: #a99bff;
+  color: #101018;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button.secundario {
+  background: transparent;
+  color: #d5ceff;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid #a99bff;
+  outline-offset: 3px;
+}
+
+.tabla-contenedor {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1d1d2b;
+}
+
+caption {
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+}
+
+th,
+td {
+  padding: 16px;
+  border-bottom: 1px solid #39394d;
+  text-align: left;
+}
+
+th {
+  background: #292939;
+  color: #c6bcff;
+}
+
+.error {
+  color: #ffb4b4;
+}
+
+.exito {
+  color: #a7efbb;
+}
