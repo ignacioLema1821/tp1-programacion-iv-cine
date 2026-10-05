@@ -1,0 +1,175 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+section {
+  padding: 24px 0;
+  color: #f5f5fa;
+}
+
+.volver {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #c6bcff;
+  text-underline-offset: 4px;
+}
+
+.encabezado {
+  padding: 24px;
+  border: 1px solid #39394d;
+  border-radius: 16px;
+  background: #1d1d2b;
+}
+
+.subtitulo {
+  margin-top: 0;
+  color: #c6bcff;
+}
+
+h2 {
+  margin: 8px 0 16px;
+  font-size: 32px;
+}
+
+p {
+  line-height: 1.6;
+}
+
+.detalle {
+  color: #c6bcff;
+}
+
+/* El botón se acomoda debajo si no entra junto al título. */
+.cabecera-horarios {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 32px 0 24px;
+}
+
+.cabecera-horarios h3 {
+  margin: 0 0 8px;
+}
+
+.cabecera-horarios p {
+  margin: 0;
+  color: #c4c4d4;
+}
+
+button {
+  padding: 12px 20px;
+  border: 1px solid #a99bff;
+  border-radius: 8px;
+  background: #a99bff;
+  color: #101018;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #c0b5ff;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #a99bff;
+  outline-offset: 3px;
+}
+
+/* Las tarjetas se distribuyen según el ancho de la pantalla. */
+.funciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 20px;
+}
+
+.funcion {
+  padding: 24px;
+  border: 1px solid #39394d;
+  border-radius: 16px;
+  background: #1d1d2b;
+}
+
+.funcion h4 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.hora {
+  margin: 12px 0 24px;
+  color: #c6bcff;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+/* dl agrupa etiquetas y valores, como Sala y su nombre. */
+dl {
+  margin: 0;
+}
+
+dl div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #39394d;
+}
+
+dt {
+  color: #c4c4d4;
+}
+
+dd {
+  margin: 0;
+}
+
+.precio {
+  margin: 24px 0 0;
+  color: #c4c4d4;
+}
+
+.precio strong {
+  display: block;
+  margin-top: 4px;
+  color: #f5f5fa;
+  font-size: 24px;
+}
+
+.sin-funciones,
+.error {
+  padding: 24px;
+  border: 1px solid #39394d;
+  border-radius: 12px;
+  background: #1d1d2b;
+}
+
+.sin-funciones {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.error {
+  color: #ffb4b4;
+}
+
+/* El enlace abre el plano de la función seleccionada. */
+.boton-butacas {
+  display: block;
+  margin-top: 24px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: #a99bff;
+  color: #101018;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.boton-butacas:hover {
+  background: #c0b5ff;
+}

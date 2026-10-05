@@ -8,8 +8,12 @@ import { SupabaseService } from './supabase.service';
 export class FuncionesService {
   private supabaseService = inject(SupabaseService);
 
-  async obtenerFunciones(): Promise<Funcion[]> {
-    const respuesta = await this.supabaseService.cliente
+  // Sin parámetros devuelve todas las funciones para el administrador.
+  async obtenerFunciones(
+    peliculaId?: number,
+    soloFuturas: boolean = false
+  ): Promise<Funcion[]> {
+    let consulta = this.supabaseService.cliente
       .from('funciones')
       .select(`
         id,
@@ -23,7 +27,20 @@ export class FuncionesService {
         precio_base,
         pelicula:peliculas(nombre),
         sala:salas(nombre)
-      `)
+      `);
+
+    // eq significa "igual a": limita la consulta a una película.
+    if (peliculaId !== undefined) {
+      consulta = consulta.eq('pelicula_id', peliculaId);
+    }
+
+    // gt significa "mayor que": buscamos inicios posteriores a ahora.
+    if (soloFuturas) {
+      const ahora = new Date().toISOString();
+      consulta = consulta.gt('inicio', ahora);
+    }
+
+    const respuesta = await consulta
       .order('inicio')
       .returns<Funcion[]>();
 
@@ -41,6 +58,7 @@ export class FuncionesService {
     idioma: string,
     precio: number
   ): Promise<number> {
+    // La función SQL valida los datos y asigna una sala disponible.
     const respuesta = await this.supabaseService.cliente.rpc(
       'programar_funcion',
       {
@@ -60,7 +78,7 @@ export class FuncionesService {
   }
 
   async eliminarFuncion(funcionId: number): Promise<void> {
-    // La base vuelve a comprobar el rol y que la función sea futura.
+    // La base comprueba el rol y que la función todavía no haya comenzado.
     const respuesta = await this.supabaseService.cliente.rpc(
       'eliminar_funcion',
       {

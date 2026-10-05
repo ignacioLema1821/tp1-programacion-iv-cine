@@ -21,7 +21,6 @@ label {
   margin-bottom: 8px;
 }
 
-/* Compartimos el aspecto de los campos de búsqueda y selección. */
 input,
 select {
   box-sizing: border-box;
@@ -38,7 +37,9 @@ input::placeholder {
   color: #a9a9bd;
 }
 
-button {
+/* El enlace tiene aspecto de botón, pero sirve para navegar. */
+button,
+.boton-funciones {
   padding: 12px 20px;
   border: 1px solid #a99bff;
   border-radius: 8px;
@@ -46,19 +47,22 @@ button {
   color: #101018;
   font: inherit;
   font-weight: bold;
+  text-align: center;
+  text-decoration: none;
   cursor: pointer;
 }
 
-button:hover {
+button:hover,
+.boton-funciones:hover {
   background: #c0b5ff;
 }
 
-/* Hace visible dónde está el foco al navegar con el teclado. */
 input:focus-visible,
 select:focus-visible,
-button:focus-visible {
+button:focus-visible,
+.boton-funciones:focus-visible {
   outline: 2px solid #a99bff;
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 .resultados {
@@ -66,7 +70,7 @@ button:focus-visible {
   color: #c4c4d4;
 }
 
-/* La grilla adapta la cantidad de columnas al ancho disponible. */
+/* La grilla adapta la cantidad de columnas al espacio disponible. */
 .peliculas {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
@@ -75,6 +79,8 @@ button:focus-visible {
 }
 
 .pelicula {
+  display: flex;
+  flex-direction: column;
   padding: 24px;
   background: #1d1d2b;
   border: 1px solid #39394d;
@@ -96,3 +102,7 @@ button:focus-visible {
   font-size: 14px;
 }
 
+/* El espacio automático mantiene los enlaces al pie de las tarjetas. */
+.boton-funciones {
+  margin-top: auto;
+}

@@ -1,0 +1,97 @@
+<section>
+  <a class="volver" routerLink="/cartelera">
+    ← Volver a la cartelera
+  </a>
+
+  @if (cargando()) {
+    <p role="status">Cargando funciones...</p>
+  } @else if (mensajeError()) {
+    <div class="error" role="alert">
+      <p>{{ mensajeError() }}</p>
+
+      <button type="button" (click)="cargarDatos()">
+        Reintentar
+      </button>
+    </div>
+  } @else if (pelicula(); as peliculaActual) {
+    <header class="encabezado">
+      <p class="subtitulo">Funciones disponibles</p>
+      <h2>{{ peliculaActual.nombre }}</h2>
+
+      <p class="detalle">
+        {{ peliculaActual.generos.join(' · ') }}
+        — {{ peliculaActual.duracion }} minutos
+      </p>
+
+      <p>{{ peliculaActual.sinopsis }}</p>
+    </header>
+
+    <div class="cabecera-horarios">
+      <div>
+        <h3>Próximos horarios</h3>
+        <p>Horarios de Argentina (UTC−3). Precios expresados en pesos.</p>
+      </div>
+
+      <button type="button" (click)="cargarDatos()">
+        Actualizar horarios
+      </button>
+    </div>
+
+    <!-- Cada tarjeta corresponde a una proyección de esta película. -->
+    <div class="funciones">
+      @for (funcion of funciones(); track funcion.id) {
+        <article class="funcion">
+          <h4>{{ funcion.inicio | date:'dd/MM/yyyy':'-0300' }}</h4>
+
+          <p class="hora">
+            {{ funcion.inicio | date:'HH:mm':'-0300' }} h
+          </p>
+
+          <dl>
+            <div>
+              <dt>Sala</dt>
+              <dd>{{ funcion.sala?.nombre || 'No disponible' }}</dd>
+            </div>
+
+            <div>
+              <dt>Formato</dt>
+              <dd>{{ funcion.formato }}</dd>
+            </div>
+
+            <div>
+              <dt>Idioma</dt>
+              <dd>
+                {{ funcion.idioma === 'castellano' ? 'Castellano' : 'Subtitulada' }}
+              </dd>
+            </div>
+
+            <div>
+              <dt>Finaliza</dt>
+              <dd>
+                {{ funcion.fin | date:'dd/MM/yyyy HH:mm':'-0300' }}
+              </dd>
+            </div>
+          </dl>
+
+          <p class="precio">
+            Precio base
+            <strong>{{ mostrarPrecio(funcion.precio_base) }}</strong>
+          </p>
+
+          <!-- Enviamos el ID de la función para cargar su sala y sus butacas. -->
+          <a
+            class="boton-butacas"
+            [routerLink]="['/funciones', funcion.id, 'butacas']"
+          >
+            Elegir butacas
+          </a>
+        </article>
+      } @empty {
+        <p class="sin-funciones" role="status">
+          Esta película todavía no tiene funciones próximas.
+          Volvé a consultar más adelante.
+        </p>
+      }
+    </div>
+  }
+</section>

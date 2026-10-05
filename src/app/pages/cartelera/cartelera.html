@@ -2,14 +2,12 @@
   <h2>Cartelera</h2>
   <p>Elegí tu próxima película.</p>
 
-  <!-- Mostramos un estado distinto mientras esperamos la respuesta. -->
   @if (cargando()) {
     <p role="status">Cargando películas...</p>
   } @else if (mensajeError()) {
     <div role="alert">
       <p>{{ mensajeError() }}</p>
 
-      <!-- El evento click llama al método del componente. -->
       <button type="button" (click)="cargarPeliculas()">
         Reintentar
       </button>
@@ -19,7 +17,7 @@
       <div class="campo">
         <label for="busqueda">Buscar por nombre</label>
 
-        <!-- ngModel mantiene sincronizados el campo y la propiedad. -->
+        <!-- ngModel conecta el campo con la propiedad del componente. -->
         <input
           id="busqueda"
           type="search"
@@ -50,7 +48,6 @@
     </p>
 
     <div class="peliculas">
-      <!-- Repetimos una tarjeta por película. El ID identifica cada elemento. -->
       @for (pelicula of peliculasFiltradas; track pelicula.id) {
         <article class="pelicula">
           <h3>{{ pelicula.nombre }}</h3>
@@ -61,6 +58,15 @@
           </p>
 
           <p>{{ pelicula.sinopsis }}</p>
+
+          <!-- El ID en la dirección indica qué película queremos consultar. -->
+          <a
+            class="boton-funciones"
+            [routerLink]="['/cartelera', pelicula.id, 'funciones']"
+            [attr.aria-label]="'Ver funciones de ' + pelicula.nombre"
+          >
+            Ver funciones
+          </a>
         </article>
       } @empty {
         <p>No encontramos películas con esos filtros.</p>

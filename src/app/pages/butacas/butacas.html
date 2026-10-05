@@ -1,0 +1,179 @@
+<section>
+  <a class="volver" routerLink="/cartelera">
+    ← Volver a la cartelera
+  </a>
+
+  @if (cargando()) {
+    <p role="status">Cargando plano de la sala...</p>
+  } @else if (mensajeError()) {
+    <div class="aviso" role="alert">
+      <p>{{ mensajeError() }}</p>
+
+      <button type="button" (click)="cargarDatos()">
+        Reintentar
+      </button>
+    </div>
+  } @else if (funcion(); as actual) {
+    <header class="encabezado">
+      <h2>Elegí tus butacas</h2>
+      <h3>{{ actual.pelicula?.nombre }}</h3>
+
+      <p>
+        {{ actual.sala?.nombre }} ·
+        {{ actual.inicio | date:'dd/MM/yyyy HH:mm':'-0300' }} h ·
+        {{ actual.formato }} ·
+        {{ actual.idioma === 'castellano' ? 'Castellano' : 'Subtitulada' }}
+      </p>
+
+      <p>
+        Entrada común y accesible:
+        {{ mostrarPrecio(actual.precio_base) }}.
+        VIP: {{ actual.sala?.recargo_vip }} % adicional.
+        Horario de Argentina.
+      </p>
+
+      <a
+        class="volver"
+        [routerLink]="['/cartelera', actual.pelicula_id, 'funciones']"
+      >
+        Cambiar de horario
+      </a>
+    </header>
+
+    @if (funcionComenzada()) {
+      <p class="aviso" role="alert">
+        Esta función ya comenzó. Elegí otro horario para continuar.
+      </p>
+    } @else {
+      <p class="ayuda">
+        Tocá una butaca para elegirla; tocala otra vez para quitarla.
+        J es la fila accesible que ocupa el antiguo espacio de J y K.
+        Las filas R, S y T son VIP.
+      </p>
+
+      <ul class="leyenda" aria-label="Tipos y estados de butacas">
+        <li>
+          <span class="muestra comun">C</span>
+          Común
+        </li>
+        <li>
+          <span class="muestra accesible">A</span>
+          Accesible
+        </li>
+        <li>
+          <span class="muestra vip">V</span>
+          VIP
+        </li>
+        <li>
+          <span class="muestra seleccionada">✓</span>
+          Seleccionada
+        </li>
+      </ul>
+
+      <!-- En pantallas pequeñas se desplaza el plano, sin desarmar las filas. -->
+      <p id="ayuda-plano" class="ayuda">
+        Si el plano no entra, deslizalo horizontalmente.
+      </p>
+
+      <div
+        class="plano-contenedor"
+        tabindex="0"
+        role="region"
+        aria-label="Plano de butacas"
+        aria-describedby="ayuda-plano"
+      >
+        <div class="plano">
+          <div class="pantalla">PANTALLA</div>
+
+          @for (fila of filas(); track fila.letra) {
+            <div
+              class="fila"
+              [class.fila-accesible]="fila.accesible"
+            >
+              <span
+                class="letra"
+                [attr.title]="fila.accesible ? 'Fila accesible J/K' : null"
+              >
+                {{ fila.letra }}
+              </span>
+
+              @for (bloque of fila.bloques; track bloque.numero) {
+                <div
+                  class="bloque"
+                  [class.central]="bloque.numero === 2"
+                >
+                  @for (butaca of bloque.butacas; track butaca.id) {
+                    <button
+                      type="button"
+                      class="butaca"
+                      [class.accesible]="butaca.tipo === 'accesible'"
+                      [class.vip]="butaca.tipo === 'vip'"
+                      [class.seleccionada]="estaSeleccionada(butaca)"
+                      [attr.aria-pressed]="estaSeleccionada(butaca)"
+                      [attr.aria-label]="butaca.fila + butaca.numero + ', ' + nombreTipo(butaca) + ', ' + mostrarPrecio(precioButaca(butaca))"
+                      [title]="butaca.fila + butaca.numero + ' · ' + nombreTipo(butaca) + ' · ' + mostrarPrecio(precioButaca(butaca))"
+                      (click)="alternarButaca(butaca)"
+                    >
+                      <span>{{ butaca.numero }}</span>
+
+                      <small aria-hidden="true">
+                        {{ marcaButaca(butaca) }}
+                      </small>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Este resumen todavía no guarda una compra ni bloquea asientos. -->
+      <aside class="resumen" aria-label="Resumen de selección">
+        <h3>Tu selección</h3>
+
+        @if (seleccionadas().length === 0) {
+          <p>Todavía no elegiste ninguna butaca.</p>
+        } @else {
+          <ul class="lista-seleccion">
+            @for (butaca of seleccionadas(); track butaca.id) {
+              <li>
+                <span>
+                  <strong>{{ butaca.fila }}{{ butaca.numero }}</strong>
+                  · {{ nombreTipo(butaca) }}
+                </span>
+
+                <span>
+                  {{ mostrarPrecio(precioButaca(butaca)) }}
+                </span>
+
+                <button
+                  type="button"
+                  class="quitar"
+                  (click)="alternarButaca(butaca)"
+                  [attr.aria-label]="'Quitar butaca ' + butaca.fila + butaca.numero"
+                >
+                  Quitar
+                </button>
+              </li>
+            }
+          </ul>
+
+          <button type="button" (click)="limpiarSeleccion()">
+            Limpiar selección
+          </button>
+        }
+
+        <p class="total" role="status">
+          {{ seleccionadas().length }} butacas ·
+          Total estimado: {{ mostrarPrecio(total()) }}
+        </p>
+
+        <p class="ayuda">
+          La selección no reserva lugares.
+          La compra todavía no está habilitada.
+        </p>
+      </aside>
+    }
+  }
+</section>

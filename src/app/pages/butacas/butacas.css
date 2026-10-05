@@ -1,0 +1,245 @@
+:host {
+  display: block;
+  min-width: 0;
+  color: #f5f5fa;
+}
+
+section {
+  padding: 24px 0;
+}
+
+p {
+  line-height: 1.6;
+}
+
+h2,
+h3 {
+  margin-top: 0;
+}
+
+h2 {
+  color: #c6bcff;
+}
+
+.volver {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #c6bcff;
+  text-underline-offset: 4px;
+}
+
+.encabezado,
+.resumen,
+.aviso {
+  padding: 24px;
+  border: 1px solid #39394d;
+  border-radius: 16px;
+  background: #1d1d2b;
+}
+
+.encabezado .volver {
+  margin-bottom: 0;
+}
+
+.aviso {
+  margin-top: 24px;
+  color: #ffb4b4;
+}
+
+.ayuda {
+  color: #c4c4d4;
+}
+
+button {
+  padding: 10px 16px;
+  border: 1px solid #a99bff;
+  border-radius: 8px;
+  background: #a99bff;
+  color: #101018;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.15);
+}
+
+button:focus-visible,
+a:focus-visible,
+.plano-contenedor:focus-visible {
+  outline: 3px solid #f5f5fa;
+  outline-offset: 3px;
+}
+
+/* La leyenda explica los colores y las letras de las butacas. */
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0;
+  margin: 24px 0;
+  list-style: none;
+}
+
+.leyenda li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.muestra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #85859d;
+  border-radius: 6px;
+  background: #292939;
+  color: #f5f5fa;
+  font-weight: bold;
+}
+
+/* El plano mantiene su distribución y permite desplazamiento horizontal. */
+.plano-contenedor {
+  overflow-x: auto;
+  border: 1px solid #39394d;
+  border-radius: 12px;
+  background: #15151f;
+}
+
+.plano {
+  width: 1040px;
+  margin: 0 auto;
+  padding: 24px 12px;
+}
+
+.pantalla {
+  margin: 0 60px 28px;
+  padding: 12px;
+  border-top: 4px solid #c6bcff;
+  border-radius: 50% 50% 0 0;
+  color: #c6bcff;
+  text-align: center;
+  letter-spacing: 6px;
+}
+
+/* Reservamos espacio para la letra y los tres bloques de butacas. */
+.fila {
+  display: grid;
+  grid-template-columns: 28px 136px 696px 136px;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.letra {
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Los bloques laterales tienen cuatro lugares y el central veinte. */
+.bloque {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.bloque.central {
+  grid-template-columns: repeat(20, 1fr);
+}
+
+.butaca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  padding: 0;
+  border: 1px solid #85859d;
+  border-radius: 7px 7px 3px 3px;
+  background: #292939;
+  color: #f5f5fa;
+  font-size: 12px;
+}
+
+.butaca small {
+  font-size: 9px;
+}
+
+/* La fila accesible tiene menos lugares, pero ocupa el mismo ancho. */
+.fila-accesible {
+  margin: 18px 0;
+}
+
+.fila-accesible .bloque {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.fila-accesible .bloque.central {
+  grid-template-columns: repeat(10, 1fr);
+}
+
+.accesible {
+  background: #173f4d;
+  border-color: #74d8f4;
+  color: #b9efff;
+}
+
+.vip {
+  background: #49361b;
+  border-color: #e9bd65;
+  color: #ffe0a3;
+}
+
+.seleccionada {
+  background: #a99bff;
+  border-color: #e0d9ff;
+  color: #101018;
+}
+
+.resumen {
+  margin-top: 24px;
+}
+
+.lista-seleccion {
+  padding: 0;
+  list-style: none;
+}
+
+.lista-seleccion li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #39394d;
+}
+
+.lista-seleccion li > span:first-child {
+  flex: 1;
+  min-width: 150px;
+}
+
+.quitar {
+  background: transparent;
+  color: #c6bcff;
+  padding: 6px 12px;
+}
+
+.total {
+  color: #c6bcff;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .encabezado,
+  .resumen,
+  .aviso {
+    padding: 16px;
+  }
+}
