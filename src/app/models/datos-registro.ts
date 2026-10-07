@@ -1,9 +1,11 @@
+// Modelo del registro: define los datos personales que el formulario envía a AuthService.
+// interface es un contrato de campos y tipos: ayuda a TypeScript a comprobar el código; no crea tablas ni valida datos en ejecución.
 export interface DatosRegistro {
-  email: string; // Correo utilizado para crear la cuenta.
-  nombre: string; // Nombre del usuario.
-  apellido: string; // Apellido del usuario.
-  fechaNacimiento: string; // Fecha escrita como año-mes-día.
-  tipoSangre: string; // Grupo sanguíneo seleccionado.
-  colorOjos: string; // Color de ojos indicado por el usuario.
-  diasVacaciones: number; // Cantidad de días de vacaciones por año.
+  email: string;
+  nombre: string;
+  apellido: string;
+  fechaNacimiento: string;
+  tipoSangre: string;
+  colorOjos: string;
+  diasVacaciones: number;
 }

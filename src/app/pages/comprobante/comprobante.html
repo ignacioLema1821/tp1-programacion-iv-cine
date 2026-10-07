@@ -1,8 +1,10 @@
+<!-- Vista de la compra confirmada: muestra sus datos, el QR y el acceso al PDF. -->
 <section>
   <h2>Tu comprobante</h2>
   @if (error()) {
     <p class="error" role="alert">{{ error() }}</p>
   }
+  <!-- as actual da un nombre local al comprobante; las llaves {{ }} imprimen sus datos como texto. -->
   @if (compra(); as actual) {
     <h3>{{ actual.pelicula_nombre }}</h3>
     <p>{{ actual.sala_nombre }} · {{ actual.inicio | date: 'dd/MM/yyyy HH:mm' : '-0300' }} h</p>
@@ -11,6 +13,7 @@
       <p>Edad mínima: {{ actual.edad_minima }} años. Debe asistir un adulto.</p>
     }
     <ul>
+      <!-- Cada entrada se identifica por fila + número dentro de esta compra, porque esa combinación no se repite. -->
       @for (entrada of actual.entradas; track entrada.fila + entrada.numero) {
         <li>
           {{ entrada.fila }}{{ entrada.numero }} · {{ entrada.tipo }} · ARS {{ entrada.precio }}
@@ -19,6 +22,7 @@
     </ul>
     <h3>Candy</h3>
     <ul>
+      <!-- $index es la posición de cada línea de candy, usada aquí porque estos datos no incluyen ID. -->
       @for (producto of actual.candy; track $index) {
         <li>{{ producto.cantidad }} × {{ producto.nombre }}</li>
       } @empty {
@@ -30,7 +34,9 @@
       Crédito utilizado: ARS {{ actual.credito_usado }} · Pago simulado: ARS
       {{ actual.pago_simulado }}
     </p>
+    <!-- Una compra cancelada conserva sus datos, pero este bloque deja de mostrar el QR y la descarga. -->
     @if (actual.estado === 'pagada') {
+      <!-- imagenQr() contiene una data URL generada por ComprobantesService; es una imagen con el código de la compra. -->
       <img [src]="imagenQr()" alt="Código QR de la entrada" width="240" height="240" />
       <p class="codigo">{{ actual.codigo }}</p>
       <p>Conservá este enlace y el código en privado: permiten abrir tu comprobante.</p>

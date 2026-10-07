@@ -1,4 +1,6 @@
+<!-- Vista de una película: presenta datos, preventa, horarios y el componente de reseñas. -->
 <section>
+  <!-- as datos es un nombre local para la película dentro de este bloque; solo aparece si la señal tiene un valor. -->
   @if (pelicula(); as datos) {
     <img
       class="poster"
@@ -21,6 +23,7 @@
   @if (aviso()) {
     <p role="status">{{ aviso() }}</p>
   }
+  <!-- Esta condición avisa que aún no abrió la preventa; la base aplica la misma regla al intentar comprar. -->
   @if (!ventaAbierta()) {
     <p>La venta todavía no abrió. Podés activar una alerta.</p>
   }
@@ -56,8 +59,8 @@
       <button type="button" (click)="cargarDatos()">Actualizar horarios</button>
     </div>
 
-    <!-- Cada tarjeta corresponde a una proyección de esta película. -->
     <div class="funciones">
+      <!-- track funcion.id reconoce cada horario. El pipe date muestra día y hora con UTC-3. -->
       @for (funcion of funciones(); track funcion.id) {
         <article class="funcion">
           <h4>{{ funcion.inicio | date: 'dd/MM/yyyy' : '-0300' }}</h4>
@@ -67,6 +70,7 @@
           <dl>
             <div>
               <dt>Sala</dt>
+              <!-- ?. evita acceder a nombre si sala es null; || presenta el texto alternativo cuando falta el dato. -->
               <dd>{{ funcion.sala?.nombre || 'No disponible' }}</dd>
             </div>
 
@@ -95,7 +99,7 @@
             <strong>{{ mostrarPrecio(funcion.precio_base) }}</strong>
           </p>
 
-          <!-- Enviamos el ID de la función para cargar su sala y sus butacas. -->
+          <!-- La ruta se construye con funcion.id para que Butacas cargue esa función y su sala. -->
           <a
             class="boton-butacas"
             [hidden]="!ventaAbierta()"
@@ -112,6 +116,7 @@
     </div>
   }
   @if (pelicula(); as datos) {
+    <!-- Composición de componentes: [peliculaId] envía datos al @Input del componente Resenas, que administra su propio HTML y servicio. -->
     <app-resenas [peliculaId]="datos.id"></app-resenas>
   }
 </section>

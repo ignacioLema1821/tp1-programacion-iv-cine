@@ -1,3 +1,6 @@
+// Servicio de catálogo: centraliza candy, beneficios, reseñas, alertas y reportes de Supabase.
+// async devuelve una Promise; await espera una operación. Supabase devuelve data/error: throw pasa el error al catch de quien llamó.
+// Consultas: from elige tabla, select indica campos, eq filtra por igualdad y order ordena; rpc ejecuta una función SQL.
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import {
@@ -11,10 +14,13 @@ import {
   Reporte,
 } from '../models/catalogo';
 
+// @Injectable permite inyectar este servicio; providedIn: root lo ofrece como una instancia compartida en toda la aplicación.
 @Injectable({ providedIn: 'root' })
 export class CatalogoService {
+  // inject obtiene el cliente compartido a través de SupabaseService; este servicio centraliza consultas para las pantallas.
   private supabase = inject(SupabaseService);
 
+  // Consulta categorías para agrupar los productos del candy.
   async categorias(): Promise<Categoria[]> {
     const r = await this.supabase.cliente
       .from('categorias_candy')
@@ -25,6 +31,7 @@ export class CatalogoService {
     return r.data;
   }
 
+  // Trae productos y precios; la pantalla de compra conserva solamente los activos.
   async productos(): Promise<Producto[]> {
     const r = await this.supabase.cliente
       .from('productos_candy')
@@ -35,6 +42,7 @@ export class CatalogoService {
     return r.data;
   }
 
+  // Consulta combos de entrada, pochoclo y bebida a un precio fijo.
   async combos(): Promise<Combo[]> {
     const r = await this.supabase.cliente
       .from('combos')
@@ -45,6 +53,7 @@ export class CatalogoService {
     return r.data;
   }
 
+  // Consulta descuentos configurados; la base verifica que el cupón se pueda usar al comprar.
   async cupones(): Promise<Cupon[]> {
     const r = await this.supabase.cliente
       .from('cupones')
@@ -55,6 +64,7 @@ export class CatalogoService {
     return r.data;
   }
 
+  // Trae los canjes posibles y su costo en puntos.
   async recompensas(): Promise<Recompensa[]> {
     const r = await this.supabase.cliente
       .from('recompensas')
@@ -65,6 +75,7 @@ export class CatalogoService {
     return r.data;
   }
 
+  // Lee la única fila de configuración general (id 1); single exige que exista una fila.
   async configuracion(): Promise<Configuracion> {
     const r = await this.supabase.cliente
       .from('configuracion_cine')
@@ -76,7 +87,7 @@ export class CatalogoService {
     return r.data;
   }
 
-  // Los formularios del catálogo comparten este método de guardado.
+  // El parámetro tabla admite solamente los cinco nombres definidos. Record<string, unknown> representa campos con valores de distintos tipos.
   async guardar(
     tabla:
       | 'categorias_candy'
@@ -86,14 +97,13 @@ export class CatalogoService {
       | 'recompensas',
     datos: Record<string, unknown>,
   ): Promise<void> {
-    // Copiamos los datos para no modificar el objeto del formulario.
+    // ...datos crea una copia del objeto del formulario. unknown permite distintos tipos de valores sin asumir qué contiene cada campo.
     const copia = { ...datos };
     const id = copia['id'];
 
-    // El ID se genera en la base y no se guarda como un campo editable.
+    // Quitamos el ID de los campos enviados porque lo genera la base. Sin ID se inserta; con ID se actualiza la fila correspondiente.
     delete copia['id'];
 
-    // Si no tiene ID, es un registro nuevo.
     if (id === null || id === undefined) {
       const r = await this.supabase.cliente
         .from(tabla)
@@ -103,7 +113,6 @@ export class CatalogoService {
       return;
     }
 
-    // Si tiene ID, actualizamos únicamente esa fila.
     const r = await this.supabase.cliente
       .from(tabla)
       .update(copia)
@@ -114,6 +123,7 @@ export class CatalogoService {
     if (r.error) throw new Error(r.error.message);
   }
 
+  // Actualiza beneficios generales. Los permisos de escritura los comprueba Supabase con sus políticas.
   async guardarConfiguracion(datos: Configuracion): Promise<void> {
     const r = await this.supabase.cliente
       .from('configuracion_cine')
@@ -123,6 +133,7 @@ export class CatalogoService {
     if (r.error) throw new Error(r.error.message);
   }
 
+  // La función de la base devuelve las reseñas públicas y su promedio para esta película.
   async resenas(peliculaId: number): Promise<Resenas> {
     const r = await this.supabase.cliente.rpc(
       'resenas_pelicula',
@@ -133,6 +144,7 @@ export class CatalogoService {
     return r.data;
   }
 
+  // upsert inserta o actualiza: onConflict identifica la combinación película + usuario, para mantener una reseña por persona.
   async guardarResena(
     peliculaId: number,
     estrellas: number,
@@ -144,7 +156,6 @@ export class CatalogoService {
       throw new Error('Iniciá sesión para dejar tu reseña.');
     }
 
-    // Una persona puede tener una reseña por película y modificarla.
     const r = await this.supabase.cliente
       .from('resenas')
       .upsert(
@@ -160,6 +171,7 @@ export class CatalogoService {
     if (r.error) throw new Error(r.error.message);
   }
 
+  // Registra una alerta del usuario. El código 23505 significa que ya existe esa combinación y no se duplica.
   async activarAlerta(peliculaId: number): Promise<void> {
     const usuario = await this.supabase.cliente.auth.getUser();
 
@@ -174,12 +186,12 @@ export class CatalogoService {
         pelicula_id: peliculaId,
       });
 
-    // Si la alerta ya existe, no necesitamos crearla nuevamente.
     if (r.error && r.error.code !== '23505') {
       throw new Error(r.error.message);
     }
   }
 
+  // Solicita a la función SQL las estadísticas agregadas dentro de las fechas elegidas.
   async reporte(desde: string, hasta: string): Promise<Reporte> {
     const r = await this.supabase.cliente.rpc(
       'reporte_cine',
@@ -193,6 +205,7 @@ export class CatalogoService {
     return r.data;
   }
 
+  // Consulta las últimas 100 acciones, ordenadas de la más reciente a la más antigua.
   async actividad(): Promise<
     {
       id: number;
@@ -212,6 +225,7 @@ export class CatalogoService {
     return r.data;
   }
 
+  // Consulta las alertas de la sesión actual; la base informa si la venta ya está disponible.
   async alertas(): Promise<
     {
       pelicula_id: number;

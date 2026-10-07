@@ -1,5 +1,7 @@
+<!-- Vista de estadísticas: filtros, tabla diaria, barras, ventas de candy y auditoría de acciones. -->
 <section>
   <h2>Reportes y actividad</h2>
+  <!-- NgForm valida las fechas. ngModel sincroniza desde/hasta y ngSubmit solicita una nueva consulta. -->
   <form #formulario="ngForm" (ngSubmit)="cargar(formulario)">
     <label>Desde<input name="desde" type="date" [(ngModel)]="desde" required /></label>
     <label
@@ -9,6 +11,7 @@
   </form>
   <button (click)="periodo(7)" [disabled]="cargando()">Últimos 7 días</button>
   <button (click)="periodo(30)" [disabled]="cargando()">Últimos 30 días</button>
+  <!-- Exporta los datos ya consultados; exportando impide generar varios archivos al mismo tiempo. -->
   <button (click)="excel()" [disabled]="cargando() || exportando()">Exportar Excel</button>
   <button (click)="pdf()" [disabled]="cargando() || exportando()">Exportar PDF</button>
   @if (error()) {
@@ -33,6 +36,7 @@
         </tr>
       </thead>
       <tbody>
+        <!-- @for genera una fila por día; track dia.dia identifica las fechas. @empty cubre un período sin ventas. -->
         @for (dia of reporte().diario; track dia.dia) {
           <tr>
             <td>{{ dia.dia }}</td>
@@ -54,6 +58,7 @@
   @for (p of reporte().peliculas; track p.pelicula) {
     <div class="grafico">
       <p>{{ p.pelicula }} · {{ p.vistas }} vistas · {{ p.entradas }} vendidas</p>
+      <!-- [style.width.%] recibe el porcentaje calculado en ancho para dibujar una barra proporcional. -->
       <div class="barra" [style.width.%]="ancho(p.vistas)"></div>
     </div>
   }
@@ -77,12 +82,14 @@
         </tr>
       </thead>
       <tbody>
+        <!-- La auditoría es una lista separada de hasta 100 acciones recientes; este bloque identifica cada registro por ID. -->
         @for (a of actividad(); track a.id) {
           <tr>
             <td>{{ a.fecha | date: 'dd/MM/yyyy HH:mm' : '-0300' }}</td>
             <td>{{ a.usuario_id || 'Compra anónima o inicialización' }}</td>
             <td>{{ a.accion }}</td>
             <td>
+              <!-- details y summary son elementos HTML que permiten desplegar el detalle sin agregar un método al componente. -->
               <details>
                 <summary>Ver detalle</summary>
                 <pre>{{ a.detalle }}</pre>

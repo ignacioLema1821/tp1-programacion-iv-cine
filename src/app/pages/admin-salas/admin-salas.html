@@ -1,3 +1,4 @@
+<!-- Vista de administración: una sección para salas, otra para el plano y otra para roles. -->
 <section>
   <h2>Salas, butacas y usuarios</h2>
   @if (error()) {
@@ -6,6 +7,7 @@
   @if (exito()) {
     <p role="status">{{ exito() }}</p>
   }
+  <!-- ngSubmit pasa el NgForm para validar. [(ngModel)] conecta campos con datos y [disabled] evita envíos repetidos. -->
   <form #fsala="ngForm" (ngSubmit)="guardarSala(fsala)">
     <h3>{{ datos.id ? 'Editar sala' : 'Nueva sala' }}</h3>
     <label>Nombre<input name="nombre" [(ngModel)]="datos.nombre" required maxlength="80" /></label>
@@ -34,6 +36,7 @@
     }
   </ul>
   <h3>Distribución de butacas</h3>
+  <!-- ngModelChange recarga el plano cuando cambia salaId; ngValue mantiene los IDs como números. -->
   <label
     >Sala<select [(ngModel)]="salaId" (ngModelChange)="cargarButacas()">
       <option [ngValue]="null">Seleccioná</option>
@@ -48,8 +51,10 @@
       <button (click)="elegirButaca(b)" [title]="b.tipo">{{ b.fila }}{{ b.numero }}</button>
     }
   </div>
+  <!-- as b permite editar la copia de la butaca seleccionada dentro de este bloque. -->
   @if (butaca(); as b) {
     <form #fbutaca="ngForm" (ngSubmit)="guardarButaca(fbutaca)">
+      <!-- pattern es una expresión regular: admite A a J y L a T; K se integra en la fila accesible J. -->
       <label
         >Fila<input name="fila" [(ngModel)]="b.fila" pattern="[A-JL-T]" required maxlength="1"
       /></label>
@@ -81,6 +86,7 @@
     </form>
   }
   <h3>Roles de usuarios registrados</h3>
+  <!-- Cada control modifica el rol local; Guardar rol solicita el cambio a la base, que verifica permisos administrativos. -->
   @for (usuario of usuarios(); track usuario.id) {
     <div>
       <span>{{ usuario.correo }}</span

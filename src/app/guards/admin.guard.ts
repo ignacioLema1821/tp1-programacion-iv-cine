@@ -1,27 +1,29 @@
+// Control de navegación: permite entrar al panel solamente si el rol consultado es admin.
+// El guard orienta la navegación en Angular; RLS y las funciones de Supabase protegen los datos aunque se intente llamar directamente a la API.
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { SupabaseService } from '../services/supabase.service';
 
-// Angular ejecuta esta función antes de permitir entrar a la ruta.
+// CanActivateFn define el contrato del guard: devuelve permiso (true) o una URL alternativa; async permite esperar a Supabase.
 export const adminGuard: CanActivateFn = async () => {
   const supabaseService = inject(SupabaseService);
   const router = inject(Router);
 
   try {
-    // Comprobamos el usuario con Supabase.
     const respuestaUsuario = await supabaseService.cliente.auth.getUser();
 
     if (respuestaUsuario.error || !respuestaUsuario.data.user) {
+      // createUrlTree construye el destino; Angular se encarga de redirigir si el guard devuelve esa URL.
       return router.createUrlTree(['/login']);
     }
 
     const usuarioId = respuestaUsuario.data.user.id;
 
-    // Consultamos el rol actual en la base.
     const respuestaPerfil = await supabaseService.cliente
       .from('perfiles')
       .select('rol')
       .eq('id', usuarioId)
+      // eq filtra por ID y single espera exactamente un perfil. Los permisos finales también se controlan en la base.
       .single();
 
     if (respuestaPerfil.error) {
@@ -32,12 +34,10 @@ export const adminGuard: CanActivateFn = async () => {
       return true;
     }
 
-    // Un usuario conectado sin rol admin vuelve a la cartelera.
     return router.createUrlTree(['/cartelera']);
   } catch (error) {
     console.error('No se pudo comprobar el acceso administrativo:', error);
 
-    // Si no podemos verificar los permisos, no permitimos entrar.
     return router.createUrlTree(['/cartelera']);
   }
 };

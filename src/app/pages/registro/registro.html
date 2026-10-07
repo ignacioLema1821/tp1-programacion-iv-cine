@@ -1,25 +1,19 @@
+<!-- Vista de registro: ngModel conecta los campos con datos y el componente agrega validaciones antes de crear la cuenta. -->
 <section class="registro">
-  <!-- Agrupa la pantalla de registro. -->
   <h2>Crear una cuenta</h2>
-  <!-- Muestra el título. -->
   <p>Completá tus datos para registrarte en CineApp.</p>
-  <!-- Explica el propósito del formulario. -->
 
+  <!-- Si el registro terminó correctamente se presenta el mensaje; @else conserva el formulario mientras falta completarlo. -->
   @if (mensajeExito()) {
-    <!-- Comprueba si hay un mensaje de finalización. -->
     <p class="exito" role="status">{{ mensajeExito() }}</p>
-    <!-- Muestra el resultado y reemplaza el formulario. -->
   } @else {
-    <!-- Muestra el formulario mientras no haya terminado correctamente. -->
+    <!-- NgForm reúne el estado de los campos; ngSubmit entrega ese formulario a registrar en registro.ts. -->
     <form #formulario="ngForm" (ngSubmit)="registrar(formulario)">
-      <!-- Da un nombre al formulario y llama al método al enviarlo. -->
+      <!-- Bloquea el formulario mientras se envía. name registra cada campo y required lo marca como obligatorio. -->
       <fieldset [disabled]="cargando()">
-        <!-- Deshabilita los campos mientras se procesa la solicitud. -->
         <legend>Datos de tu cuenta</legend>
-        <!-- Identifica el grupo de campos. -->
 
         <label for="nombre">Nombre</label>
-        <!-- Identifica el campo de nombre. -->
         <input
           id="nombre"
           name="nombre"
@@ -28,10 +22,8 @@
           [(ngModel)]="datos.nombre"
           required
         />
-        <!-- Sincroniza el nombre y lo exige. -->
 
         <label for="apellido">Apellido</label>
-        <!-- Identifica el campo de apellido. -->
         <input
           id="apellido"
           name="apellido"
@@ -40,10 +32,9 @@
           [(ngModel)]="datos.apellido"
           required
         />
-        <!-- Sincroniza el apellido y lo exige. -->
 
+        <!-- type email ayuda al navegador; la directiva email agrega la validación de correo al formulario de Angular. -->
         <label for="email">Correo electrónico</label>
-        <!-- Identifica el campo de correo. -->
         <input
           id="email"
           name="email"
@@ -53,10 +44,9 @@
           required
           email
         />
-        <!-- Valida presencia y formato del correo con Angular. -->
 
+        <!-- [max] limita la fecha a hoy; el componente también rechaza una fecha futura antes de enviar. -->
         <label for="fechaNacimiento">Fecha de nacimiento</label>
-        <!-- Identifica el campo de fecha. -->
         <input
           id="fechaNacimiento"
           name="fechaNacimiento"
@@ -66,30 +56,20 @@
           [(ngModel)]="datos.fechaNacimiento"
           required
         />
-        <!-- Permite ingresar la fecha y limita la selección a hoy. -->
 
         <label for="tipoSangre">Tipo de sangre</label>
-        <!-- Identifica el selector de grupo sanguíneo. -->
         <select id="tipoSangre" name="tipoSangre" [(ngModel)]="datos.tipoSangre" required>
-          <!-- Sincroniza la selección y la exige. -->
           <option value="">Seleccioná una opción</option>
-          <!-- Representa que todavía no se eligió un grupo. -->
+          <!-- @for crea opciones con los grupos definidos en TypeScript; track tipo identifica cada opción por su texto. -->
           @for (tipo of tiposSangre; track tipo) {
-            <!-- Recorre los grupos sanguíneos disponibles. -->
             <option [value]="tipo">{{ tipo }}</option>
-            <!-- Crea una opción con ese grupo. -->
           }
-          <!-- Termina el recorrido. -->
         </select>
-        <!-- Cierra el selector. -->
 
         <label for="colorOjos">Color de ojos</label>
-        <!-- Identifica el campo de color de ojos. -->
         <input id="colorOjos" name="colorOjos" type="text" [(ngModel)]="datos.colorOjos" required />
-        <!-- Sincroniza el texto y lo exige. -->
 
         <label for="diasVacaciones">Días de vacaciones por año</label>
-        <!-- Identifica el campo numérico. -->
         <input
           id="diasVacaciones"
           name="diasVacaciones"
@@ -99,10 +79,9 @@
           [(ngModel)]="datos.diasVacaciones"
           required
         />
-        <!-- Permite ingresar la cantidad de días. -->
 
+        <!-- minlength exige ocho caracteres. TypeScript compara contraseña y confirmación porque esa regla depende de ambos campos. -->
         <label for="password">Contraseña</label>
-        <!-- Identifica el campo de contraseña. -->
         <input
           id="password"
           name="password"
@@ -113,12 +92,9 @@
           minlength="8"
           aria-describedby="ayudaPassword"
         />
-        <!-- Oculta los caracteres y exige al menos ocho. -->
         <small id="ayudaPassword">Usá al menos 8 caracteres.</small>
-        <!-- Explica el requisito de contraseña. -->
 
         <label for="confirmarPassword">Repetir contraseña</label>
-        <!-- Identifica el campo de confirmación. -->
         <input
           id="confirmarPassword"
           name="confirmarPassword"
@@ -127,26 +103,16 @@
           [(ngModel)]="confirmarPassword"
           required
         />
-        <!-- Guarda la repetición para compararla en TypeScript. -->
 
+        <!-- El envío llama a registrar; el ternario cambia el texto y disabled impide repetir clics mientras se procesa. -->
         <button type="submit" [disabled]="cargando()">
-          <!-- Envía el formulario y evita clics mientras espera. -->
           {{ cargando() ? 'Creando cuenta...' : 'Crear cuenta' }}
-          <!-- Cambia el texto según el estado de envío. -->
         </button>
-        <!-- Cierra el botón. -->
       </fieldset>
-      <!-- Cierra el grupo de campos. -->
 
       @if (mensajeError()) {
-        <!-- Comprueba si hay un error para mostrar. -->
         <p class="error" role="alert">{{ mensajeError() }}</p>
-        <!-- Muestra el error debajo del formulario. -->
       }
-      <!-- Termina el bloque de error. -->
     </form>
-    <!-- Cierra el formulario. -->
   }
-  <!-- Termina el bloque que decide entre formulario y resultado. -->
 </section>
-<!-- Cierra la pantalla. -->

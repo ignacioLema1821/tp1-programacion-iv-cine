@@ -1,8 +1,11 @@
+<!-- Vista de reseñas: muestra promedio y comentarios, y ofrece escribir una reseña si hay sesión. -->
 <section>
+  <!-- datos() lee la señal de resultados; {{ }} presenta el promedio como texto. -->
   <h3>Reseñas · Promedio {{ datos().promedio }} / 5</h3>
   @if (error()) {
     <p class="error" role="alert">{{ error() }}</p>
   }
+  <!-- $index identifica aquí la posición porque la respuesta pública no incluye IDs; @empty cubre una lista sin reseñas. -->
   @for (resena of datos().resenas; track $index) {
     <article>
       <strong>{{ resena.estrellas }} ★</strong>
@@ -13,9 +16,11 @@
     <p>Todavía no hay reseñas.</p>
   }
   @if (auth.usuario()) {
+    <!-- NgForm reúne validaciones y ngSubmit entrega el formulario a guardar en resenas.ts. -->
     <form #formulario="ngForm" (ngSubmit)="guardar(formulario)">
       <label
         >Estrellas<select name="estrellas" [(ngModel)]="estrellas">
+          <!-- [ngValue] conserva estrellas como número; ngModel mantiene sincronizado el selector con la propiedad del componente. -->
           <option [ngValue]="1">1</option>
           <option [ngValue]="2">2</option>
           <option [ngValue]="3">3</option>
@@ -31,6 +36,7 @@
           maxlength="300"
         ></textarea>
       </label>
+      <!-- guardando() evita otro envío pendiente; el servicio actualiza la reseña existente de ese usuario y película. -->
       <button [disabled]="guardando()">Guardar mi reseña</button>
       <p>Tu nueva reseña reemplaza la anterior para esta película.</p>
     </form>

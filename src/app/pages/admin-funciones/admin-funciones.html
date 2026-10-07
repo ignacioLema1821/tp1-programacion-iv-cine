@@ -1,8 +1,8 @@
+<!-- Vista de programación: recoge fechas y opciones y presenta las funciones guardadas. -->
 <section>
   <h2>Programación de funciones</h2>
   <p>Los horarios se ingresan y muestran en horario de Argentina (UTC−3).</p>
 
-  <!-- Estos mensajes muestran el resultado de las acciones. -->
   @if (mensajeExito()) {
     <p class="exito" role="status">{{ mensajeExito() }}</p>
   }
@@ -20,17 +20,17 @@
       <button type="button" (click)="cargarDatos()">Reintentar</button>
     </div>
   } @else {
-    <!-- Al enviar el formulario, se ejecuta el método del componente. -->
+    <!-- NgForm agrupa validaciones; ngSubmit llama a programarFuncion. ngModel mantiene sincronizados los campos. -->
     <form #formulario="ngForm" (ngSubmit)="programarFuncion(formulario)">
       <h3>Nueva función</h3>
       <p>La sala se asignará automáticamente según la disponibilidad.</p>
 
-      <!-- Deshabilitamos los campos mientras se guarda o elimina. -->
       <fieldset [disabled]="guardando() || eliminando()">
         <legend>Datos de la función</legend>
 
         <label for="peliculaId">Película</label>
         <select id="peliculaId" name="peliculaId" [(ngModel)]="peliculaId" required>
+          <!-- [ngValue] mantiene null o un ID numérico para distinguir una película elegida de la opción vacía. -->
           <option [ngValue]="null">Seleccioná una película</option>
 
           @for (pelicula of peliculas(); track pelicula.id) {
@@ -92,6 +92,7 @@
             <label
               >Hasta<input name="hasta" type="date" [(ngModel)]="fechaHasta" [min]="fecha" required
             /></label>
+            <!-- $index empieza en cero; i + 1 convierte la posición en un día de 1 (lunes) a 7 (domingo). -->
             @for (dia of diasSemana; track dia; let i = $index) {
               <label
                 ><input
@@ -119,7 +120,7 @@
 
     <h3>Funciones registradas: {{ funciones().length }}</h3>
 
-    <!-- Esta tarjeta aparece al elegir una función para eliminar. -->
+    <!-- as seleccionada da un nombre local al valor de la señal para usarlo dentro del bloque de confirmación. -->
     @if (funcionAEliminar(); as seleccionada) {
       <div class="confirmacion" role="alert">
         <h3>Confirmar eliminación</h3>
@@ -133,7 +134,6 @@
 
         <p>Esta acción no se puede deshacer.</p>
 
-        <!-- Agrupamos los botones para separarlos con CSS. -->
         <div class="acciones-confirmacion">
           <button
             class="boton-peligro"
@@ -157,7 +157,6 @@
     }
 
     @if (funciones().length > 0) {
-      <!-- Si falta espacio, se puede desplazar la tabla horizontalmente. -->
       <div class="tabla-contenedor" tabindex="0" role="region" aria-label="Funciones programadas">
         <table>
           <caption>
@@ -179,6 +178,7 @@
           </thead>
 
           <tbody>
+            <!-- track funcion.id identifica las filas. El pipe date formatea el instante con horario UTC-3. -->
             @for (funcion of funciones(); track funcion.id) {
               <tr>
                 <td>{{ funcion.pelicula?.nombre || 'No disponible' }}</td>
@@ -190,6 +190,7 @@
                 <td>{{ funcion.idioma }}</td>
                 <td>ARS {{ funcion.precio_base }}</td>
                 <td>
+                  <!-- Esta condición controla el botón visible; el servicio y la base vuelven a validar antes de eliminar. -->
                   @if (esFuncionFutura(funcion)) {
                     <button
                       class="boton-eliminar"

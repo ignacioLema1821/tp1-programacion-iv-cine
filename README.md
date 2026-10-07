@@ -58,8 +58,13 @@ Se comprobó la compilación y pasaron las tres pruebas de navegación
 según sesión y rol. También se revisaron los recorridos públicos
 del sitio publicado.
 
-Las pruebas manuales completas de compra, cancelación, comprobantes
-y validación están en proceso.
+Se comprobaron manualmente en el sitio publicado la compra simulada,
+la descarga del comprobante PDF con QR, la cancelación y liberación
+de butacas, el uso de crédito, la validación por separado de cine y candy
+y el rechazo de códigos ya utilizados. También se probaron el escaneo
+con la cámara del celular, los reportes PDF y Excel y la instalación
+de la aplicación. Estas comprobaciones cubren los recorridos principales;
+no representan pruebas exhaustivas de todas las combinaciones posibles.
 
 ## Decisiones de implementación
 

@@ -1,3 +1,4 @@
+// Mapa de navegación: relaciona cada dirección con el componente que Angular debe mostrar.
 import { AdminCatalogo } from './pages/admin-catalogo/admin-catalogo';
 import { AdminSalas } from './pages/admin-salas/admin-salas';
 import { Reportes } from './pages/reportes/reportes';
@@ -15,16 +16,20 @@ import { Admin } from './pages/admin/admin';
 import { AdminFunciones } from './pages/admin-funciones/admin-funciones';
 import { adminGuard } from './guards/admin.guard';
 
+// Routes es el tipo de esta lista. Angular prueba rutas en orden; las más específicas están antes y ** queda al final.
 export const routes: Routes = [
+  // canActivate ejecuta el guard antes de abrir la pantalla. No reemplaza los permisos de Supabase.
   { path: 'admin/reportes', component: Reportes, canActivate: [adminGuard] },
   { path: 'admin/salas', component: AdminSalas, canActivate: [adminGuard] },
   { path: 'admin/catalogo', component: AdminCatalogo, canActivate: [adminGuard] },
+  // :codigo es un parámetro variable que Comprobante lee con ActivatedRoute.
   { path: 'comprobante/:codigo', component: Comprobante },
   { path: 'perfil', component: Perfil },
   { path: 'empleado', component: Empleado, canActivate: [empleadoGuard] },
   {
     path: '',
     redirectTo: 'cartelera',
+    // full exige que coincida toda la dirección: esta redirección se aplica solamente a la URL vacía.
     pathMatch: 'full',
   },
   {
@@ -32,12 +37,10 @@ export const routes: Routes = [
     component: Cartelera,
   },
   {
-    // peliculaId identifica de qué película queremos ver los horarios.
     path: 'cartelera/:peliculaId/funciones',
     component: FuncionesPelicula,
   },
   {
-    // funcionId identifica el horario y la sala para elegir butacas.
     path: 'funciones/:funcionId/butacas',
     component: Butacas,
   },
@@ -60,7 +63,6 @@ export const routes: Routes = [
     canActivate: [adminGuard],
   },
   {
-    // Si ninguna ruta coincide, volvemos a la cartelera.
     path: '**',
     redirectTo: 'cartelera',
   },

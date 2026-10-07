@@ -1,3 +1,4 @@
+// Horarios de una película: lee el ID de la URL y muestra funciones, preventa y reseñas.
 import { Resenas } from '../resenas/resenas';
 import { CatalogoService } from '../../services/catalogo.service';
 import { Component, inject, signal } from '@angular/core';
@@ -9,16 +10,20 @@ import { Funcion } from '../../models/funcion';
 import { PeliculasService } from '../../services/peliculas.service';
 import { FuncionesService } from '../../services/funciones.service';
 
+// @Component relaciona la clase con su HTML y CSS. selector es su etiqueta; standalone permite declarar aquí las dependencias del template.
 @Component({
   selector: 'app-funciones-pelicula',
   standalone: true,
+  // imports habilita en este HTML las directivas, pipes o componentes indicados; no crea por sí solo servicios ni datos.
   imports: [RouterLink, DatePipe, Resenas],
   templateUrl: './funciones-pelicula.html',
   styleUrl: './funciones-pelicula.css',
 })
 export class FuncionesPelicula {
+  // inject pide a Angular una dependencia disponible. private la reserva para esta clase; this accede a sus propiedades y métodos.
   private ruta = inject(ActivatedRoute);
   private catalogo = inject(CatalogoService);
+  // signal guarda estado reactivo: nombre() lee el valor y nombre.set(...) lo cambia; Angular actualiza sus usos en la pantalla.
   aviso = signal('');
   private peliculasService = inject(PeliculasService);
   private funcionesService = inject(FuncionesService);
@@ -30,18 +35,18 @@ export class FuncionesPelicula {
 
   private peliculaId = 0;
 
-  // Nos permite descartar una respuesta vieja si cambia la película.
   private numeroCarga = 0;
 
+  // ActivatedRoute da los parámetros de esta dirección; paramMap es un observable que avisa si cambia peliculaId.
   constructor() {
-    // Leemos el ID de la dirección y escuchamos si cambia.
-    // takeUntilDestroyed deja de escuchar cuando salimos del componente.
     this.ruta.paramMap.pipe(takeUntilDestroyed()).subscribe((parametros) => {
       this.peliculaId = Number(parametros.get('peliculaId'));
       void this.cargarDatos();
     });
   }
 
+  // Busca la película y sus funciones futuras. numeroCarga evita sobrescribir la pantalla con una respuesta anterior.
+  // async devuelve una Promise; await espera la respuesta sin bloquear la página. Promise<void> indica que no devuelve un dato al terminar.
   async cargarDatos(): Promise<void> {
     const cargaActual = ++this.numeroCarga;
     const id = this.peliculaId;
@@ -51,15 +56,14 @@ export class FuncionesPelicula {
     this.pelicula.set(null);
     this.funciones.set([]);
 
-    // También validamos el ID si alguien escribe la dirección a mano.
     if (!Number.isSafeInteger(id) || id <= 0) {
       this.mensajeError.set('La dirección de la película no es válida.');
       this.cargando.set(false);
       return;
     }
 
+    // try intenta la operación; catch permite mostrar un error. Si hay finally, se ejecuta tanto con éxito como con error.
     try {
-      // Reutilizamos el servicio existente para buscar la película.
       const peliculas = await this.peliculasService.obtenerPeliculas();
 
       if (cargaActual !== this.numeroCarga) {
@@ -73,7 +77,6 @@ export class FuncionesPelicula {
         return;
       }
 
-      // true indica que queremos únicamente funciones futuras.
       const funciones = await this.funcionesService.obtenerFunciones(id, true);
 
       if (cargaActual !== this.numeroCarga) {
@@ -94,13 +97,14 @@ export class FuncionesPelicula {
     }
   }
 
-  // Presentamos el importe con separadores y moneda de Argentina.
+  // Formatea pesos argentinos con separadores y símbolo de moneda.
   mostrarPrecio(precio: number): string {
     return precio.toLocaleString('es-AR', {
       style: 'currency',
       currency: 'ARS',
     });
   }
+  // Resta dias_preventa al estreno y compara con ahora. La base vuelve a controlar la apertura al confirmar una compra.
   ventaAbierta(): boolean {
     const pelicula = this.pelicula();
     if (!pelicula?.estreno) return true;
@@ -108,6 +112,7 @@ export class FuncionesPelicula {
     apertura.setDate(apertura.getDate() - pelicula.dias_preventa);
     return Date.now() >= apertura.getTime();
   }
+  // Guarda una alerta del usuario para avisarle dentro de la aplicación cuando abra la venta.
   async activarAlerta(): Promise<void> {
     const pelicula = this.pelicula();
     if (!pelicula) return;

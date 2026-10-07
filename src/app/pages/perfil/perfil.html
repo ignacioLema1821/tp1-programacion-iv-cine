@@ -1,5 +1,7 @@
+<!-- Vista del perfil: organiza el saldo, las alertas, las películas vistas, los canjes y las compras. -->
 <section>
   <h2>Mi perfil</h2>
+  <!-- as usuario reutiliza la sesión dentro del bloque; si no hay sesión se ofrece iniciar sesión al final. -->
   @if (auth.usuario(); as usuario) {
     <p>
       {{ usuario.user_metadata['nombre'] }} {{ usuario.user_metadata['apellido'] }} ·
@@ -13,6 +15,7 @@
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
+    <!-- La señal aCancelar solamente abre esta confirmación; el cambio en la base se solicita con cancelar(). -->
     @if (aCancelar(); as compra) {
       <div class="confirmacion">
         <p>¿Cancelar {{ compra.pelicula_nombre }} y recibir ARS {{ compra.total }} de crédito?</p>
@@ -22,6 +25,7 @@
     }
     <h3>Alertas de venta</h3>
     <button (click)="cargar()" [disabled]="cargando()">Actualizar perfil y alertas</button>
+    <!-- track pelicula_id identifica el aviso; la condición disponible decide si se ofrece abrir los horarios. -->
     @for (alerta of alertas(); track alerta.pelicula_id) {
       <p>
         {{ alerta.nombre }} ·
@@ -35,6 +39,7 @@
     }
     <h3>Mis películas</h3>
     <div class="vistas">
+      <!-- El historial se identifica por compra_id: una persona puede haber visto la misma película en varias compras. -->
       @for (pelicula of vistas(); track pelicula.compra_id) {
         <article>
           <img
@@ -58,6 +63,7 @@
     </div>
     <h3>Historial de canjes</h3>
     <ul>
+      <!-- @empty muestra una alternativa si no hay elementos; date formatea fechas para la presentación. -->
       @for (canje of canjes(); track canje.id) {
         <li>
           {{ canje.nombre }} · {{ canje.puntos }} puntos · {{ canje.fecha | date: 'dd/MM/yyyy' }} ·
@@ -74,6 +80,7 @@
         <p>{{ compra.sala_nombre }} · {{ compra.inicio | date: 'dd/MM/yyyy HH:mm' : '-0300' }}</p>
         <p>{{ compra.estado }} · ARS {{ compra.total }}</p>
         <a [routerLink]="['/comprobante', compra.codigo]">Ver comprobante</a>
+        <!-- Este método controla el botón visible; la base vuelve a comprobar que se pueda cancelar cuando se envía la solicitud. -->
         @if (puedeCancelar(compra)) {
           <button (click)="aCancelar.set(compra)" [disabled]="cancelando()">Cancelar compra</button>
         }

@@ -1,13 +1,16 @@
+<!-- Vista principal: conserva el encabezado y deja al router cambiar el contenido dentro de main. -->
 <div class="contenedor">
   <header>
     <h1>CineApp</h1>
     <p>Tu próxima película empieza acá.</p>
 
+    <!-- routerLink cambia de pantalla sin recargar todo el sitio; routerLinkActive agrega la clase del enlace activo. -->
     <nav aria-label="Navegación principal">
       <a routerLink="/cartelera" routerLinkActive="activo" ariaCurrentWhenActive="page">
         Cartelera
       </a>
 
+      <!-- @if muestra un bloque si su condición es verdadera. usuario() y rol() leen señales del servicio compartido. -->
       @if (authService.cargandoSesion()) {
         <span class="usuario" role="status"> Comprobando sesión... </span>
       } @else {
@@ -20,6 +23,7 @@
             <a routerLink="/admin/reportes" routerLinkActive="activo">Reportes</a>
             <a routerLink="/admin/salas" routerLinkActive="activo">Salas y usuarios</a>
             <a routerLink="/admin/catalogo" routerLinkActive="activo">Catálogo</a>
+            <!-- exact: true evita marcar Películas como activo también en otras rutas que empiezan por /admin. -->
             <a
               routerLink="/admin"
               routerLinkActive="activo"
@@ -44,6 +48,7 @@
             <span class="usuario"> Rol: {{ authService.rol() }} </span>
           }
 
+          <!-- (click) llama al método de app.ts; [disabled] bloquea el botón mientras la solicitud está pendiente. -->
           <button type="button" (click)="cerrarSesion()" [disabled]="cerrandoSesion()">
             {{ cerrandoSesion() ? 'Cerrando...' : 'Cerrar sesión' }}
           </button>
@@ -70,6 +75,7 @@
 
   @if (authService.usuario() && notificaciones().length > 0) {
     <aside class="notificaciones" aria-label="Alertas de estreno" role="status">
+      <!-- @for recorre los avisos; track usa el ID de película para reconocer cada elemento cuando cambia la lista. -->
       @for (alerta of notificaciones(); track alerta.pelicula_id) {
         <p>
           ¡Ya abrió la venta de {{ alerta.nombre }}!
@@ -79,6 +85,7 @@
     </aside>
   }
   <main>
+    <!-- RouterOutlet es el espacio donde Angular coloca el componente de la ruta actual. -->
     <router-outlet></router-outlet>
   </main>
 </div>

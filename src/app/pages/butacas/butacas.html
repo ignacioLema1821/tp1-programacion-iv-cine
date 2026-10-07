@@ -1,6 +1,8 @@
+<!-- Vista de selección y carrito: el plano usa filas/bloques del componente y la compra se confirma en Supabase. -->
 <section>
   <a class="volver" routerLink="/cartelera"> ← Volver a la cartelera </a>
 
+  <!-- Las señales se leen con (); @if elige entre carga, error o datos de la función. -->
   @if (cargando()) {
     <p role="status">Cargando plano de la sala...</p>
   } @else if (mensajeError()) {
@@ -9,12 +11,14 @@
 
       <button type="button" (click)="cargarDatos()">Reintentar</button>
     </div>
+  <!-- as actual nombra el valor de funcion() dentro del bloque, evitando repetir la lectura para cada dato. -->
   } @else if (funcion(); as actual) {
     <header class="encabezado">
       <h2>Elegí tus butacas</h2>
       <h3>{{ actual.pelicula?.nombre }}</h3>
 
       <p>
+        <!-- ?. lee un dato solo si la relación existe. El pipe date cambia su presentación, no el instante guardado. -->
         {{ actual.sala?.nombre }} · {{ actual.inicio | date: 'dd/MM/yyyy HH:mm' : '-0300' }} h ·
         {{ actual.formato }} ·
         {{ actual.idioma === 'castellano' ? 'Castellano' : 'Subtitulada' }}
@@ -58,7 +62,6 @@
         </li>
       </ul>
 
-      <!-- En pantallas pequeñas se desplaza el plano, sin desarmar las filas. -->
       <p id="ayuda-plano" class="ayuda">Si el plano no entra, deslizalo horizontalmente.</p>
 
       <div
@@ -71,6 +74,7 @@
         <div class="plano">
           <div class="pantalla">PANTALLA</div>
 
+          <!-- Los tres @for recorren filas, bloques y butacas. track identifica cada elemento con su letra, número o ID. -->
           @for (fila of filas(); track fila.letra) {
             <div class="fila" [class.fila-accesible]="fila.accesible">
               <span class="letra" [attr.title]="fila.accesible ? 'Fila accesible J/K' : null">
@@ -80,6 +84,9 @@
               @for (bloque of fila.bloques; track bloque.numero) {
                 <div class="bloque" [class.central]="bloque.numero === 2">
                   @for (butaca of bloque.butacas; track butaca.id) {
+                    <!-- [class.vip] aplica una clase si la condición es verdadera; [disabled] impide elegir lugares ocupados o comprar mientras se envía. -->
+                    <!-- aria-pressed informa la selección y aria-label describe fila, número, tipo y precio a lectores de pantalla. -->
+                    <!-- (click) pasa esta butaca al método que agrega o quita su selección en butacas.ts. -->
                     <button
                       type="button"
                       class="butaca"
@@ -123,7 +130,6 @@
         </div>
       </div>
 
-      <!-- La compra se confirma en Supabase; elegir una butaca todavía no la reserva. -->
       <aside class="resumen" aria-label="Resumen de selección">
         <h3>Tu selección</h3>
 
@@ -142,6 +148,7 @@
                   {{ mostrarPrecio(precioButaca(butaca)) }}
                 </span>
 
+                <!-- La descripción accesible incluye la butaca concreta, por ejemplo Quitar butaca A1; el texto visible sigue siendo Quitar. -->
                 <button
                   type="button"
                   class="quitar"
@@ -176,6 +183,7 @@
           Continuar con la compra
         </button>
         @if (mostrarCompra()) {
+          <!-- #formularioCompra="ngForm" reúne controles y validaciones; ngSubmit lo entrega a confirmarCompra. -->
           <form #formularioCompra="ngForm" (ngSubmit)="confirmarCompra(formularioCompra)">
             <fieldset [disabled]="comprando()">
               <legend>Confirmar compra</legend>
@@ -189,6 +197,7 @@
                 required
                 email
               />
+              <!-- Los visitantes pueden comprar con correo y fecha; los beneficios de una cuenta se consultan desde la sesión. -->
               @if (!auth.usuario()) {
                 <label for="nacimiento-compra"
                   >Fecha de nacimiento (necesaria si hay restricción de edad)</label
@@ -214,6 +223,7 @@
                 >
               }
               <h3>Candy opcional</h3>
+              <!-- El input de cada producto escribe cantidades[id]. Su name dinámico hace que cada control tenga un nombre distinto. -->
               @for (producto of productos(); track producto.id) {
                 <label
                   >{{ producto.nombre }} · {{ mostrarPrecio(producto.precio) }}
@@ -231,6 +241,7 @@
               <label
                 >Entrada + pochoclo + bebida (un combo por compra)
                 <select name="combo" [(ngModel)]="comboId">
+                  <!-- ngValue mantiene null o IDs numéricos al seleccionar combo o recompensa. -->
                   <option [ngValue]="null">Sin combo</option>
                   @for (combo of combos(); track combo.id) {
                     <option [ngValue]="combo.id">
@@ -256,6 +267,7 @@
                 </label>
                 <p>Elegí combo o canje. Para canjear candy, agregá ese producto al carrito.</p>
               }
+              <!-- Estos importes son una estimación de la pantalla; la función SQL revisa precios y disponibilidad al confirmar. -->
               <p>Total estimado con descuento: {{ mostrarPrecio(totalConDescuento()) }}</p>
               <p>Pago simulado estimado: {{ mostrarPrecio(pagoEstimado()) }}</p>
               <label

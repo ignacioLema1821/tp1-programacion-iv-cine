@@ -1,16 +1,21 @@
+<!-- Vista del empleado: lee el QR o permite escribir el código, elige sector y pide la validación. -->
 <section>
   <h2>Validación de entradas</h2>
   <p>
     Ingresá el código del comprobante. Cine y candy se validan por separado una sola vez, usando el
     mismo código.
   </p>
+  <!-- (click) llama al lector; [disabled] evita abrir otra cámara mientras ya hay lectura o validación en curso. -->
   <button type="button" (click)="abrirCamara()" [disabled]="escaneando() || procesando()">
     Escanear QR con cámara
   </button>
   <button type="button" (click)="detenerCamara()" [disabled]="!escaneando()">Detener cámara</button>
+  <!-- #video es la referencia que busca ViewChild en empleado.ts. hidden oculta el video cuando no se escanea. -->
   <video #video [hidden]="!escaneando()" muted playsinline width="320"></video>
+  <!-- NgForm comprueba el código obligatorio; ngSubmit llama a validar. Escanear solamente completa el campo. -->
   <form #formulario="ngForm" (ngSubmit)="validar(formulario)">
     <label for="sector">Sector</label>
+    <!-- ngModel guarda cine o candy en sector para elegir qué validación se solicita a Supabase. -->
     <select id="sector" name="sector" [(ngModel)]="sector">
       <option value="cine">Cine</option>
       <option value="candy">Candy</option>
@@ -19,6 +24,7 @@
     <input id="codigo" name="codigo" [(ngModel)]="codigo" required [disabled]="procesando()" />
     <button type="submit" [disabled]="procesando()">Validar código</button>
   </form>
+  <!-- role status comunica el resultado y role alert anuncia errores también a lectores de pantalla. -->
   @if (mensaje()) {
     <p class="exito" role="status">{{ mensaje() }}</p>
   }

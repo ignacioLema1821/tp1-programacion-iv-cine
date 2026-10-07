@@ -1,3 +1,4 @@
+// Panel de funciones: programa una proyección o un período y pide confirmación antes de eliminar.
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -6,17 +7,21 @@ import { Funcion } from '../../models/funcion';
 import { PeliculasService } from '../../services/peliculas.service';
 import { FuncionesService } from '../../services/funciones.service';
 
+// @Component relaciona la clase con su HTML y CSS. selector es su etiqueta; standalone permite declarar aquí las dependencias del template.
 @Component({
   selector: 'app-admin-funciones',
   standalone: true,
+  // FormsModule habilita ngModel y NgForm. imports declara componentes, directivas y pipes usados en el HTML de esta pantalla.
   imports: [FormsModule, DatePipe],
   templateUrl: './admin-funciones.html',
   styleUrl: './admin-funciones.css',
 })
 export class AdminFunciones implements OnInit {
+  // inject pide a Angular una dependencia disponible. private la reserva para esta clase; this accede a sus propiedades y métodos.
   private peliculasService = inject(PeliculasService);
   private funcionesService = inject(FuncionesService);
 
+  // signal guarda estado reactivo: nombre() lee el valor y nombre.set(...) lo cambia; Angular actualiza sus usos en la pantalla.
   peliculas = signal<Pelicula[]>([]);
   funciones = signal<Funcion[]>([]);
 
@@ -28,7 +33,6 @@ export class AdminFunciones implements OnInit {
   mensajeError = signal('');
   mensajeExito = signal('');
 
-  // Guarda la función elegida mientras esperamos la confirmación.
   funcionAEliminar = signal<Funcion | null>(null);
 
   peliculaId: number | null = null;
@@ -44,14 +48,18 @@ export class AdminFunciones implements OnInit {
 
   formatos = ['2D', '3D', '4D', '5D'];
 
+  // Angular llama a ngOnInit una vez, después de establecer los inputs iniciales. implements OnInit comprueba el contrato; no llama al método por sí mismo.
+  // async devuelve una Promise; await espera la respuesta sin bloquear la página. Promise<void> indica que no devuelve un dato al terminar.
   async ngOnInit(): Promise<void> {
     await this.cargarDatos();
   }
 
+  // Carga películas para el selector y todas las funciones para la tabla administrativa.
   async cargarDatos(): Promise<void> {
     this.cargando.set(true);
     this.errorCarga.set('');
 
+    // try intenta la operación; catch permite mostrar un error. Si hay finally, se ejecuta tanto con éxito como con error.
     try {
       const peliculas = await this.peliculasService.obtenerPeliculas();
       const funciones = await this.funcionesService.obtenerFunciones();
@@ -66,6 +74,7 @@ export class AdminFunciones implements OnInit {
     }
   }
 
+  // Valida el formulario y decide entre una función o un período repetido; la base asigna las salas.
   async programarFuncion(formulario: NgForm): Promise<void> {
     if (this.guardando() || this.eliminando()) {
       return;
@@ -85,6 +94,7 @@ export class AdminFunciones implements OnInit {
       return;
     }
 
+    // Une fecha y hora del formulario con UTC-3. toISOString envía el mismo instante en un formato estándar UTC.
     const inicio = new Date(`${this.fecha}T${this.hora}:00-03:00`);
 
     if (Number.isNaN(inicio.getTime()) || inicio.getTime() <= Date.now()) {
@@ -95,6 +105,7 @@ export class AdminFunciones implements OnInit {
     this.guardando.set(true);
 
     try {
+      // La repetición envía días de semana y rango; la programación simple envía un único instante de inicio.
       if (this.repetir) {
         const cantidad = await this.funcionesService.programarPeriodo(
           this.peliculaId,
@@ -161,10 +172,12 @@ export class AdminFunciones implements OnInit {
     }
   }
 
+  // Compara los milisegundos del inicio con el momento actual para decidir si se ofrece eliminar.
   esFuncionFutura(funcion: Funcion): boolean {
     return new Date(funcion.inicio).getTime() > Date.now();
   }
 
+  // Guarda la función elegida y muestra la confirmación; todavía no ejecuta ningún borrado.
   solicitarEliminacion(funcion: Funcion): void {
     if (this.guardando() || this.eliminando()) {
       return;
@@ -173,16 +186,17 @@ export class AdminFunciones implements OnInit {
     this.mensajeError.set('');
     this.mensajeExito.set('');
 
-    // Todavía no borramos nada: mostramos qué se va a eliminar.
     this.funcionAEliminar.set(funcion);
   }
 
+  // Cierra la confirmación sin modificar la base.
   cancelarEliminacion(): void {
     if (!this.eliminando()) {
       this.funcionAEliminar.set(null);
     }
   }
 
+  // Después de confirmar, llama al servicio y actualiza el listado.
   async confirmarEliminacion(): Promise<void> {
     const funcion = this.funcionAEliminar();
 
@@ -218,6 +232,7 @@ export class AdminFunciones implements OnInit {
       this.eliminando.set(false);
     }
   }
+  // Alterna el día en la lista: los números 1 a 7 representan lunes a domingo, como espera la función SQL.
   cambiarDia(dia: number): void {
     if (this.diasSeleccionados.includes(dia))
       this.diasSeleccionados = this.diasSeleccionados.filter((d) => d !== dia);

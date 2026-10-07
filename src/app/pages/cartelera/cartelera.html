@@ -1,9 +1,11 @@
+<!-- Vista de la cartelera: muestra carga/errores, filtros y tarjetas de películas. -->
 <section>
   <h2>Cartelera</h2>
   <p>
     Elegí tu próxima película. Primero mostramos las tres más vendidas y después las destacadas.
   </p>
 
+  <!-- cargando() lee una señal. @if muestra el aviso mientras cargarPeliculas espera a Supabase. -->
   @if (cargando()) {
     <p role="status">Cargando películas...</p>
   } @else if (mensajeError()) {
@@ -16,6 +18,7 @@
     <div class="filtros">
       <div class="campo">
         <label for="seccion">Sección</label>
+        <!-- [(ngModel)] sincroniza la opción con seccion; los getters del componente usan ese valor para filtrar. -->
         <select id="seccion" [(ngModel)]="seccion">
           <option value="todas">Todas las películas</option>
           <option value="actuales">En cartelera</option>
@@ -25,7 +28,6 @@
       <div class="campo">
         <label for="busqueda">Buscar por nombre</label>
 
-        <!-- ngModel conecta el campo con la propiedad del componente. -->
         <input id="busqueda" type="search" placeholder="Ejemplo: Coco" [(ngModel)]="busqueda" />
       </div>
 
@@ -35,6 +37,7 @@
         <select id="genero" [(ngModel)]="generoSeleccionado">
           <option value="">Todos los géneros</option>
 
+          <!-- generosDisponibles es un getter, por eso no lleva (). track genero usa el nombre para identificar cada opción. -->
           @for (genero of generosDisponibles; track genero) {
             <option [value]="genero">{{ genero }}</option>
           }
@@ -47,8 +50,10 @@
     <p class="resultados" role="status">Películas encontradas: {{ peliculasFiltradas.length }}</p>
 
     <div class="peliculas">
+      <!-- @for recorre la lista filtrada; track pelicula.id permite reconocer las tarjetas si la lista cambia. -->
       @for (pelicula of peliculasFiltradas; track pelicula.id) {
         <article class="pelicula">
+          <!-- [src] y [alt] reciben valores del componente; || usa la imagen de respaldo si no hay una ruta configurada. -->
           <img
             class="poster"
             [src]="pelicula.imagen || '/posters/default.svg'"
@@ -70,6 +75,7 @@
           </p>
           <h3>{{ pelicula.nombre }}</h3>
 
+          <!-- {{ }} muestra texto. join reúne los nombres de géneros con el separador indicado. -->
           <p class="detalle">
             {{ pelicula.generos.join(' · ') }}
             — {{ pelicula.duracion }} minutos
@@ -77,7 +83,7 @@
 
           <p>{{ pelicula.sinopsis }}</p>
 
-          <!-- El ID en la dirección indica qué película queremos consultar. -->
+          <!-- aria-label describe qué película abre el enlace para quien usa un lector de pantalla. -->
           <a
             class="boton-funciones"
             [routerLink]="['/cartelera', pelicula.id, 'funciones']"

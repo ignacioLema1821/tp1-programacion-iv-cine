@@ -1,3 +1,4 @@
+// Perfil: muestra compras, películas vistas, canjes y saldo; permite solicitar una cancelación.
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -6,17 +7,21 @@ import { AuthService } from '../../services/auth.service';
 import { ComprasService } from '../../services/compras.service';
 import { Comprobante, Saldo } from '../../models/compra';
 
+// @Component relaciona la clase con su HTML y CSS. selector es su etiqueta; standalone permite declarar aquí las dependencias del template.
 @Component({
   selector: 'app-perfil',
   standalone: true,
+  // imports habilita en este HTML las directivas, pipes o componentes indicados; no crea por sí solo servicios ni datos.
   imports: [DatePipe, RouterLink],
   templateUrl: './perfil.html',
   styleUrl: './perfil.css',
 })
 export class Perfil implements OnInit {
+  // inject pide a Angular una dependencia disponible. private la reserva para esta clase; this accede a sus propiedades y métodos.
   auth = inject(AuthService);
   private compras = inject(ComprasService);
   private supabase = inject(SupabaseService);
+  // signal guarda estado reactivo: nombre() lee el valor y nombre.set(...) lo cambia; Angular actualiza sus usos en la pantalla.
   vistas = signal<
     {
       compra_id: string;
@@ -38,13 +43,17 @@ export class Perfil implements OnInit {
   cancelando = signal(false);
   aCancelar = signal<Comprobante | null>(null);
 
+  // Angular llama a ngOnInit una vez, después de establecer los inputs iniciales. implements OnInit comprueba el contrato; no llama al método por sí mismo.
+  // async devuelve una Promise; await espera la respuesta sin bloquear la página. Promise<void> indica que no devuelve un dato al terminar.
   async ngOnInit(): Promise<void> {
     await this.cargar();
   }
 
+  // Reúne historial, películas vistas, alertas, saldo y canjes de la sesión; la base controla el acceso a datos personales.
   async cargar(): Promise<void> {
     this.cargando.set(true);
     this.error.set('');
+    // try intenta la operación; catch permite mostrar un error. Si hay finally, se ejecuta tanto con éxito como con error.
     try {
       const historial = await this.compras.historial();
       this.historial.set(historial);
@@ -72,15 +81,18 @@ export class Perfil implements OnInit {
     }
   }
 
+  // Ofrece cancelar si está pagada, no se validó y faltan al menos dos horas; SQL verifica nuevamente esas condiciones.
   puedeCancelar(compra: Comprobante): boolean {
     return (
       compra.estado === 'pagada' &&
       !compra.cine_validado &&
       !compra.candy_validado &&
+      // Las fechas se comparan en milisegundos: 2 × 60 × 60 × 1000 representa dos horas.
       Date.now() <= new Date(compra.inicio).getTime() - 2 * 60 * 60 * 1000
     );
   }
 
+  // Cancela la compra elegida en aCancelar y recarga el perfil para mostrar el crédito y los puntos actualizados.
   async cancelar(): Promise<void> {
     const compra = this.aCancelar();
     if (!compra || this.cancelando()) return;

@@ -1,3 +1,4 @@
+<!-- Vista del catálogo: cada formulario llama al mismo guardar indicando qué tipo de datos envía. -->
 <section>
   <h2>Catálogo y beneficios</h2>
   @if (error()) {
@@ -6,6 +7,7 @@
   @if (exito()) {
     <p class="exito" role="status">{{ exito() }}</p>
   }
+  <!-- Cada referencia #f... obtiene un NgForm independiente. ngSubmit pasa ese formulario y el tipo al componente. -->
   <form #fconfig="ngForm" (ngSubmit)="guardar('configuracion', fconfig)">
     <h3>Beneficios generales</h3>
     <label
@@ -35,6 +37,7 @@
     /></label>
     <button [disabled]="guardando()">Crear categoría</button>
   </form>
+  <!-- Un ID existente indica edición. ngModel conecta los campos con el objeto producto del componente. -->
   <form #fproducto="ngForm" (ngSubmit)="guardar('producto', fproducto)">
     <h3>{{ producto.id ? 'Editar producto' : 'Nuevo producto' }}</h3>
     <label
@@ -42,6 +45,7 @@
     /></label>
     <label
       >Categoría<select name="categoria" [(ngModel)]="producto.categoria_id" required>
+        <!-- [ngValue] permite conservar null o IDs numéricos, sin convertirlos en textos. -->
         <option [ngValue]="null">Seleccioná una categoría</option>
         @for (categoria of categorias(); track categoria.id) {
           <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
@@ -62,6 +66,7 @@
     <button [disabled]="guardando()">Guardar producto</button>
   </form>
   <ul>
+    <!-- @for dibuja productos; track p.id conserva la identidad de cada fila al recargar la lista. -->
     @for (p of productos(); track p.id) {
       <li>
         {{ p.nombre }} · ARS {{ p.precio }} · {{ p.activo ? 'Activo' : 'Inactivo' }}
@@ -69,6 +74,7 @@
       </li>
     }
   </ul>
+  <!-- Los selectores relacionan el combo con los IDs de pochoclo y bebida; el precio se configura para el conjunto. -->
   <form #fcombo="ngForm" (ngSubmit)="guardar('combo', fcombo)">
     <h3>{{ combo.id ? 'Editar combo' : 'Nuevo combo: entrada + pochoclo + bebida' }}</h3>
     <label>Nombre<input name="nombre" [(ngModel)]="combo.nombre" required /></label>
@@ -105,6 +111,7 @@
       <li>{{ c.nombre }} · ARS {{ c.precio }} <button (click)="editarCombo(c)">Editar</button></li>
     }
   </ul>
+  <!-- Configura el cupón; su uso, edad y descuento definitivo también se comprueban en la base. -->
   <form #fcupon="ngForm" (ngSubmit)="guardar('cupon', fcupon)">
     <h3>{{ cupon.id ? 'Editar cupón' : 'Nuevo cupón' }}</h3>
     <label>Código<input name="codigo" [(ngModel)]="cupon.codigo" required maxlength="30" /></label>
@@ -155,6 +162,7 @@
         <option value="candy">Candy</option>
       </select></label
     >
+    <!-- @if agrega el selector de producto solamente cuando el canje es de candy. -->
     @if (recompensa.tipo === 'candy') {
       <label
         >Producto<select name="producto" [(ngModel)]="recompensa.producto_id" required>

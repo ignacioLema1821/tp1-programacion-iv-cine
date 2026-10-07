@@ -1,15 +1,21 @@
+// Servicio de programación: consulta horarios y solicita a la base crear o eliminar funciones.
+// async devuelve una Promise; await espera una operación. Supabase devuelve data/error: throw pasa el error al catch de quien llamó.
+// Consultas: from elige tabla, select indica campos, eq filtra por igualdad y order ordena; rpc ejecuta una función SQL.
 import { Injectable, inject } from '@angular/core';
 import { Funcion } from '../models/funcion';
 import { SupabaseService } from './supabase.service';
 
+// @Injectable permite inyectar este servicio; providedIn: root lo ofrece como una instancia compartida en toda la aplicación.
 @Injectable({
   providedIn: 'root',
 })
 export class FuncionesService {
+  // inject obtiene el cliente compartido a través de SupabaseService; este servicio centraliza consultas para las pantallas.
   private supabaseService = inject(SupabaseService);
 
-  // Sin parámetros devuelve todas las funciones para el administrador.
+  // peliculaId? es opcional. La consulta agrega filtros si se pide una película o solamente horarios futuros.
   async obtenerFunciones(peliculaId?: number, soloFuturas: boolean = false): Promise<Funcion[]> {
+    // La consulta se arma por pasos. pelicula:peliculas y sala:salas incluyen datos de tablas relacionadas con esos alias.
     let consulta = this.supabaseService.cliente.from('funciones').select(`
         id,
         pelicula_id,
@@ -24,17 +30,16 @@ export class FuncionesService {
         sala:salas(nombre)
       `);
 
-    // eq significa "igual a": limita la consulta a una película.
     if (peliculaId !== undefined) {
       consulta = consulta.eq('pelicula_id', peliculaId);
     }
 
-    // gt significa "mayor que": buscamos inicios posteriores a ahora.
     if (soloFuturas) {
       const ahora = new Date().toISOString();
       consulta = consulta.gt('inicio', ahora);
     }
 
+    // returns<Funcion[]> declara el tipo esperado para TypeScript; no convierte ni valida por sí solo los datos recibidos.
     const respuesta = await consulta.order('inicio').returns<Funcion[]>();
 
     if (respuesta.error) {
@@ -57,6 +62,7 @@ export class FuncionesService {
     return respuesta.data;
   }
 
+  // Delega en SQL la asignación de una sala libre, incluyendo duración y tiempo de limpieza.
   async programarFuncion(
     peliculaId: number,
     inicio: string,
@@ -64,7 +70,6 @@ export class FuncionesService {
     idioma: string,
     precio: number,
   ): Promise<number> {
-    // La función SQL valida los datos y asigna una sala disponible.
     const respuesta = await this.supabaseService.cliente.rpc('programar_funcion', {
       p_pelicula_id: peliculaId,
       p_inicio: inicio,
@@ -80,8 +85,8 @@ export class FuncionesService {
     return respuesta.data;
   }
 
+  // Pide eliminar por ID; el servidor comprueba el rol y las condiciones antes de modificar la base.
   async eliminarFuncion(funcionId: number): Promise<void> {
-    // La base comprueba el rol y que la función todavía no haya comenzado.
     const respuesta = await this.supabaseService.cliente.rpc('eliminar_funcion', {
       p_funcion_id: funcionId,
     });
@@ -90,6 +95,7 @@ export class FuncionesService {
       throw new Error(respuesta.error.message);
     }
   }
+  // Envía rango, hora y días elegidos. La base programa el conjunto de funciones y devuelve cuántas creó.
   async programarPeriodo(
     peliculaId: number,
     desde: string,

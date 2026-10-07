@@ -1,9 +1,11 @@
+<!-- Vista de inicio de sesión: recoge correo y contraseña y muestra el resultado del intento. -->
 <section class="login">
   <h2>Iniciar sesión</h2>
   <p>Ingresá con el correo y la contraseña de tu cuenta.</p>
 
-  <!-- Angular controla los campos y ejecuta el método al enviar. -->
+  <!-- #formulario="ngForm" obtiene su estado de validación; (ngSubmit) lo pasa al método de login.ts. -->
   <form #formulario="ngForm" (ngSubmit)="iniciarSesion(formulario)">
+    <!-- Deshabilita el conjunto durante la solicitud. Cada name registra un control y ngModel sincroniza su valor. -->
     <fieldset [disabled]="cargando()">
       <legend>Datos de acceso</legend>
 
@@ -28,11 +30,13 @@
         required
       />
 
+      <!-- El operador condición ? texto1 : texto2 cambia el mensaje mientras se espera la respuesta. -->
       <button type="submit" [disabled]="cargando()">
         {{ cargando() ? 'Ingresando...' : 'Iniciar sesión' }}
       </button>
     </fieldset>
 
+    <!-- La señal vacía no muestra este bloque; role alert anuncia el error de forma accesible. -->
     @if (mensajeError()) {
       <p class="error" role="alert">{{ mensajeError() }}</p>
     }

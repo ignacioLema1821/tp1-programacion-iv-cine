@@ -1,20 +1,24 @@
+// Servicio de archivos: convierte el código de una compra en QR y genera su PDF.
 import { Injectable } from '@angular/core';
 import { Comprobante } from '../models/compra';
 
+// @Injectable permite inyectar este servicio; providedIn: root lo ofrece como una instancia compartida en toda la aplicación.
 @Injectable({ providedIn: 'root' })
 export class ComprobantesService {
+  // Genera una imagen PNG como texto data URL, que puede usarse directamente como src de una imagen.
   async qr(codigo: string): Promise<string> {
-    // El QR guarda el mismo código que puede escribir el empleado a mano.
-    const QRCode = await import('qrcode');
+    // default contiene el objeto principal de esta biblioteca al cargarla con import().
+    const { default: QRCode } = await import('qrcode');
     return QRCode.toDataURL(codigo, { width: 240, margin: 2 });
   }
 
+  // Arma el PDF con los datos confirmados de la compra. import() carga la biblioteca solamente cuando se necesita.
   async descargar(compra: Comprobante): Promise<void> {
-    // Cargamos la biblioteca al descargar, sin agrandar la carga inicial.
     const { jsPDF } = await import('jspdf');
     const pdf = new jsPDF();
     const qr = await this.qr(compra.codigo);
     let y = 20;
+    // Función flecha local: usa pdf e y de este método para partir texto largo y avanzar la posición vertical.
     const linea = (texto: string) => {
       const lineas = pdf.splitTextToSize(texto, 170) as string[];
       for (const textoLinea of lineas) {
@@ -61,6 +65,7 @@ export class ComprobantesService {
       pdf.addPage();
       y = 20;
     }
+    // Agrega al PDF la misma imagen QR que identifica la compra; cada sector controla su uso en la base.
     pdf.addImage(qr, 'PNG', 20, y, 55, 55);
     y += 65;
     linea('Codigo: ' + compra.codigo);

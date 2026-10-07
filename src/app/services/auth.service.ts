@@ -1,27 +1,31 @@
+// Servicio de autenticación: registra usuarios, abre/cierra sesiones y comparte el usuario y su rol.
+// async devuelve una Promise; await espera una operación. Supabase devuelve data/error: throw pasa el error al catch de quien llamó.
+// Consultas: from elige tabla, select indica campos, eq filtra por igualdad y order ordena; rpc ejecuta una función SQL.
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { User } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase.service';
 import { DatosRegistro } from '../models/datos-registro';
 
+// @Injectable permite inyectar este servicio; providedIn: root lo ofrece como una instancia compartida en toda la aplicación.
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  // inject obtiene el cliente compartido a través de SupabaseService; este servicio centraliza consultas para las pantallas.
   private supabaseService = inject(SupabaseService);
 
+  // La señal se lee con usuario() y se actualiza con usuario.set(...). User | null admite una sesión con usuario o ninguna sesión.
   usuario = signal<User | null>(null);
   cargandoSesion = signal(true);
 
-  // Solo aceptamos los tres roles definidos en la base.
   rol = signal<'cliente' | 'empleado' | 'admin' | null>(null);
   cargandoRol = signal(false);
   errorRol = signal('');
 
-  // Identifica la consulta más reciente para ignorar respuestas anteriores.
   private numeroConsultaRol = 0;
 
+  // onAuthStateChange avisa cuando cambia la sesión. effect reacciona al cambio de usuario para cargar su rol.
   constructor() {
-    // Este callback solamente actualiza el usuario y el estado de sesión.
     this.supabaseService.cliente.auth.onAuthStateChange((_evento, sesion) => {
       if (sesion) {
         this.usuario.set(sesion.user);
@@ -32,11 +36,12 @@ export class AuthService {
       this.cargandoSesion.set(false);
     });
 
-    // Cuando cambia el usuario, consultamos su rol fuera del callback de Auth.
     effect(() => {
+      // Leer usuario() dentro de effect crea una dependencia: al cambiar la señal, Angular vuelve a ejecutar el bloque.
       const usuarioActual = this.usuario();
 
       if (usuarioActual) {
+        // void indica que no esperamos esa Promise aquí; cargarRol maneja sus propios errores. No convierte la operación en sincrónica.
         void this.cargarRol(usuarioActual.id);
       } else {
         void this.cargarRol(null);
@@ -44,10 +49,10 @@ export class AuthService {
     });
   }
 
+  // Consulta perfiles por ID. El contador permite descartar una respuesta vieja si cambió el usuario durante la espera.
   private async cargarRol(usuarioId: string | null): Promise<void> {
     const numeroConsulta = ++this.numeroConsultaRol;
 
-    // Quitamos la información anterior antes de consultar otro perfil.
     this.rol.set(null);
     this.errorRol.set('');
     this.cargandoRol.set(usuarioId !== null);
@@ -63,7 +68,6 @@ export class AuthService {
         .eq('id', usuarioId)
         .single();
 
-      // Si comenzó otra consulta, esta respuesta ya no debe actualizar la pantalla.
       if (numeroConsulta !== this.numeroConsultaRol) {
         return;
       }
@@ -96,10 +100,12 @@ export class AuthService {
     }
   }
 
+  // signUp crea la cuenta. options.data guarda los datos personales como metadatos; devuelve si además se inició una sesión.
   async registrar(datos: DatosRegistro, password: string): Promise<boolean> {
     const respuesta = await this.supabaseService.cliente.auth.signUp({
       email: datos.email.trim(),
       password: password,
+      // Los metadatos personales acompañan la cuenta; el rol se consulta por separado en la tabla perfiles.
       options: {
         data: {
           nombre: datos.nombre.trim(),
@@ -119,6 +125,7 @@ export class AuthService {
     return respuesta.data.session !== null;
   }
 
+  // signInWithPassword verifica correo y contraseña en Supabase; los cambios de sesión se reflejan en usuario().
   async iniciarSesion(email: string, password: string): Promise<void> {
     const respuesta = await this.supabaseService.cliente.auth.signInWithPassword({
       email: email.trim(),
@@ -130,6 +137,7 @@ export class AuthService {
     }
   }
 
+  // signOut con scope local cierra la sesión de este navegador.
   async cerrarSesion(): Promise<void> {
     const respuesta = await this.supabaseService.cliente.auth.signOut({
       scope: 'local',

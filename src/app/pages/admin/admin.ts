@@ -1,19 +1,24 @@
+// Panel de películas: carga el listado y controla los formularios de creación, edición y detalles.
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Pelicula } from '../../models/pelicula';
 import { Genero } from '../../models/genero';
 import { PeliculasService } from '../../services/peliculas.service';
 
+// @Component relaciona la clase con su HTML y CSS. selector es su etiqueta; standalone permite declarar aquí las dependencias del template.
 @Component({
   selector: 'app-admin',
   standalone: true,
+  // FormsModule habilita ngModel y NgForm. imports declara componentes, directivas y pipes usados en el HTML de esta pantalla.
   imports: [FormsModule],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })
 export class Admin implements OnInit {
+  // inject pide a Angular una dependencia disponible. private la reserva para esta clase; this accede a sus propiedades y métodos.
   private peliculasService = inject(PeliculasService);
 
+  // signal guarda estado reactivo: nombre() lee el valor y nombre.set(...) lo cambia; Angular actualiza sus usos en la pantalla.
   peliculas = signal<Pelicula[]>([]);
   generos = signal<Genero[]>([]);
 
@@ -24,7 +29,7 @@ export class Admin implements OnInit {
   mensajeError = signal('');
   mensajeExito = signal('');
 
-  // Si es null, creamos una película. Si tiene un ID, la editamos.
+  // number | null: null significa nueva película; un número conserva el ID de la que se está editando.
   peliculaEditandoId: number | null = null;
 
   datos = {
@@ -44,14 +49,18 @@ export class Admin implements OnInit {
     precio: null as number | null,
   };
 
+  // Angular llama a ngOnInit una vez, después de establecer los inputs iniciales. implements OnInit comprueba el contrato; no llama al método por sí mismo.
+  // async devuelve una Promise; await espera la respuesta sin bloquear la página. Promise<void> indica que no devuelve un dato al terminar.
   async ngOnInit(): Promise<void> {
     await this.cargarDatos();
   }
 
+  // Pide géneros y películas al servicio; set guarda los resultados para que el HTML los muestre.
   async cargarDatos(): Promise<void> {
     this.cargando.set(true);
     this.errorCarga.set('');
 
+    // try intenta la operación; catch permite mostrar un error. Si hay finally, se ejecuta tanto con éxito como con error.
     try {
       const generos = await this.peliculasService.obtenerGeneros();
       const peliculas = await this.peliculasService.obtenerPeliculas();
@@ -66,15 +75,16 @@ export class Admin implements OnInit {
     }
   }
 
+  // Alterna un ID en la selección: includes comprueba si existe y filter crea una lista sin ese género.
   cambiarGenero(generoId: number): void {
     if (this.generosSeleccionados.includes(generoId)) {
-      // Si ya estaba seleccionado, lo quitamos.
       this.generosSeleccionados = this.generosSeleccionados.filter((id) => id !== generoId);
     } else {
       this.generosSeleccionados.push(generoId);
     }
   }
 
+  // Carga una copia de la película en el formulario. resetForm también reinicia el estado de validación.
   editarPelicula(pelicula: Pelicula, formulario: NgForm): void {
     this.peliculaEditandoId = pelicula.id;
 
@@ -84,15 +94,16 @@ export class Admin implements OnInit {
       sinopsis: pelicula.sinopsis,
     };
 
-    // Copiamos los IDs para no modificar la lista original al editar.
     this.generosSeleccionados = [...pelicula.generoIds];
 
+    // NgForm agrupa los campos; resetForm carga estos valores y deja el formulario como no enviado/no tocado.
     formulario.resetForm(this.datos);
 
     this.mensajeError.set('');
     this.mensajeExito.set('');
   }
 
+  // Vuelve al modo de creación y limpia el formulario; no modifica la película guardada.
   cancelarEdicion(formulario: NgForm): void {
     this.peliculaEditandoId = null;
 
@@ -107,6 +118,7 @@ export class Admin implements OnInit {
     this.mensajeError.set('');
   }
 
+  // Valida campos y géneros, espera al servicio y vuelve a cargar los datos confirmados por la base.
   async guardarPelicula(formulario: NgForm): Promise<void> {
     if (this.guardando()) {
       return;
@@ -144,7 +156,6 @@ export class Admin implements OnInit {
       this.cancelarEdicion(formulario);
       this.mensajeExito.set('La película se guardó correctamente.');
 
-      // Volvemos a consultar para mostrar los datos confirmados por la base.
       await this.cargarDatos();
     } catch (error) {
       console.error('Error al guardar la película:', error);
@@ -154,6 +165,7 @@ export class Admin implements OnInit {
       this.guardando.set(false);
     }
   }
+  // find busca la primera película cuyo ID coincide y copia sus datos al segundo formulario.
   cargarDetalles(): void {
     const pelicula = this.peliculas().find((p) => p.id === this.detalleId);
     if (!pelicula) return;
@@ -166,6 +178,7 @@ export class Admin implements OnInit {
       precio: pelicula.precio_preventa,
     };
   }
+  // Guarda los datos complementarios sin volver a crear la película.
   async guardarDetalles(formulario: NgForm): Promise<void> {
     if (!this.detalleId || formulario.invalid || this.guardando()) return;
     this.guardando.set(true);
