@@ -1,3 +1,5 @@
+import { Resenas } from '../resenas/resenas';
+import { CatalogoService } from '../../services/catalogo.service';
 import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -10,12 +12,14 @@ import { FuncionesService } from '../../services/funciones.service';
 @Component({
   selector: 'app-funciones-pelicula',
   standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, Resenas],
   templateUrl: './funciones-pelicula.html',
-  styleUrl: './funciones-pelicula.css'
+  styleUrl: './funciones-pelicula.css',
 })
 export class FuncionesPelicula {
   private ruta = inject(ActivatedRoute);
+  private catalogo = inject(CatalogoService);
+  aviso = signal('');
   private peliculasService = inject(PeliculasService);
   private funcionesService = inject(FuncionesService);
 
@@ -32,12 +36,10 @@ export class FuncionesPelicula {
   constructor() {
     // Leemos el ID de la dirección y escuchamos si cambia.
     // takeUntilDestroyed deja de escuchar cuando salimos del componente.
-    this.ruta.paramMap
-      .pipe(takeUntilDestroyed())
-      .subscribe(parametros => {
-        this.peliculaId = Number(parametros.get('peliculaId'));
-        void this.cargarDatos();
-      });
+    this.ruta.paramMap.pipe(takeUntilDestroyed()).subscribe((parametros) => {
+      this.peliculaId = Number(parametros.get('peliculaId'));
+      void this.cargarDatos();
+    });
   }
 
   async cargarDatos(): Promise<void> {
@@ -64,9 +66,7 @@ export class FuncionesPelicula {
         return;
       }
 
-      const peliculaEncontrada = peliculas.find(
-        pelicula => pelicula.id === id
-      );
+      const peliculaEncontrada = peliculas.find((pelicula) => pelicula.id === id);
 
       if (!peliculaEncontrada) {
         this.mensajeError.set('No encontramos esa película.');
@@ -74,10 +74,7 @@ export class FuncionesPelicula {
       }
 
       // true indica que queremos únicamente funciones futuras.
-      const funciones = await this.funcionesService.obtenerFunciones(
-        id,
-        true
-      );
+      const funciones = await this.funcionesService.obtenerFunciones(id, true);
 
       if (cargaActual !== this.numeroCarga) {
         return;
@@ -88,9 +85,7 @@ export class FuncionesPelicula {
     } catch (error) {
       if (cargaActual === this.numeroCarga) {
         console.error('Error al cargar las funciones:', error);
-        this.mensajeError.set(
-          'No pudimos cargar los horarios. Intentá nuevamente.'
-        );
+        this.mensajeError.set('No pudimos cargar los horarios. Intentá nuevamente.');
       }
     } finally {
       if (cargaActual === this.numeroCarga) {
@@ -103,7 +98,24 @@ export class FuncionesPelicula {
   mostrarPrecio(precio: number): string {
     return precio.toLocaleString('es-AR', {
       style: 'currency',
-      currency: 'ARS'
+      currency: 'ARS',
     });
+  }
+  ventaAbierta(): boolean {
+    const pelicula = this.pelicula();
+    if (!pelicula?.estreno) return true;
+    const apertura = new Date(pelicula.estreno + 'T00:00:00-03:00');
+    apertura.setDate(apertura.getDate() - pelicula.dias_preventa);
+    return Date.now() >= apertura.getTime();
+  }
+  async activarAlerta(): Promise<void> {
+    const pelicula = this.pelicula();
+    if (!pelicula) return;
+    try {
+      await this.catalogo.activarAlerta(pelicula.id);
+      this.aviso.set('Alerta activada. Vas a verla en tu perfil cuando abra la venta.');
+    } catch (error) {
+      this.aviso.set(error instanceof Error ? error.message : 'No pudimos activar la alerta.');
+    }
   }
 }

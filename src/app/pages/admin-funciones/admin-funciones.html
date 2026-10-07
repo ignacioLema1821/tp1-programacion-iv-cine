@@ -17,9 +17,7 @@
     <div role="alert">
       <p class="error">{{ errorCarga() }}</p>
 
-      <button type="button" (click)="cargarDatos()">
-        Reintentar
-      </button>
+      <button type="button" (click)="cargarDatos()">Reintentar</button>
     </div>
   } @else {
     <!-- Al enviar el formulario, se ejecuta el método del componente. -->
@@ -32,12 +30,7 @@
         <legend>Datos de la función</legend>
 
         <label for="peliculaId">Película</label>
-        <select
-          id="peliculaId"
-          name="peliculaId"
-          [(ngModel)]="peliculaId"
-          required
-        >
+        <select id="peliculaId" name="peliculaId" [(ngModel)]="peliculaId" required>
           <option [ngValue]="null">Seleccioná una película</option>
 
           @for (pelicula of peliculas(); track pelicula.id) {
@@ -50,36 +43,19 @@
         <div class="fila">
           <div class="campo">
             <label for="fecha">Fecha</label>
-            <input
-              id="fecha"
-              name="fecha"
-              type="date"
-              [(ngModel)]="fecha"
-              required
-            />
+            <input id="fecha" name="fecha" type="date" [(ngModel)]="fecha" required />
           </div>
 
           <div class="campo">
             <label for="hora">Hora de inicio</label>
-            <input
-              id="hora"
-              name="hora"
-              type="time"
-              [(ngModel)]="hora"
-              required
-            />
+            <input id="hora" name="hora" type="time" [(ngModel)]="hora" required />
           </div>
         </div>
 
         <div class="fila">
           <div class="campo">
             <label for="formato">Formato</label>
-            <select
-              id="formato"
-              name="formato"
-              [(ngModel)]="formato"
-              required
-            >
+            <select id="formato" name="formato" [(ngModel)]="formato" required>
               @for (opcion of formatos; track opcion) {
                 <option [value]="opcion">{{ opcion }}</option>
               }
@@ -88,12 +64,7 @@
 
           <div class="campo">
             <label for="idioma">Idioma</label>
-            <select
-              id="idioma"
-              name="idioma"
-              [(ngModel)]="idioma"
-              required
-            >
+            <select id="idioma" name="idioma" [(ngModel)]="idioma" required>
               <option value="castellano">Castellano</option>
               <option value="subtitulada">Subtitulada</option>
             </select>
@@ -113,6 +84,25 @@
         />
 
         <div class="acciones-formulario">
+          <label
+            ><input name="repetir" type="checkbox" [(ngModel)]="repetir" /> Repetir por días de la
+            semana</label
+          >
+          @if (repetir) {
+            <label
+              >Hasta<input name="hasta" type="date" [(ngModel)]="fechaHasta" [min]="fecha" required
+            /></label>
+            @for (dia of diasSemana; track dia; let i = $index) {
+              <label
+                ><input
+                  type="checkbox"
+                  [checked]="diasSeleccionados.includes(i + 1)"
+                  (change)="cambiarDia(i + 1)"
+                />
+                {{ dia }}</label
+              >
+            }
+          }
           <button
             type="submit"
             [disabled]="guardando() || eliminando() || peliculas().length === 0"
@@ -137,8 +127,8 @@
         <p>
           ¿Querés eliminar la función de
           <strong>{{ seleccionada.pelicula?.nombre }}</strong>
-          en <strong>{{ seleccionada.sala?.nombre }}</strong>,
-          del {{ seleccionada.inicio | date:'dd/MM/yyyy HH:mm':'-0300' }}?
+          en <strong>{{ seleccionada.sala?.nombre }}</strong
+          >, del {{ seleccionada.inicio | date: 'dd/MM/yyyy HH:mm' : '-0300' }}?
         </p>
 
         <p>Esta acción no se puede deshacer.</p>
@@ -168,14 +158,11 @@
 
     @if (funciones().length > 0) {
       <!-- Si falta espacio, se puede desplazar la tabla horizontalmente. -->
-      <div
-        class="tabla-contenedor"
-        tabindex="0"
-        role="region"
-        aria-label="Funciones programadas"
-      >
+      <div class="tabla-contenedor" tabindex="0" role="region" aria-label="Funciones programadas">
         <table>
-          <caption>Programación del cine</caption>
+          <caption>
+            Programación del cine
+          </caption>
 
           <thead>
             <tr>
@@ -196,9 +183,9 @@
               <tr>
                 <td>{{ funcion.pelicula?.nombre || 'No disponible' }}</td>
                 <td>{{ funcion.sala?.nombre || 'No disponible' }}</td>
-                <td>{{ funcion.inicio | date:'dd/MM/yyyy HH:mm':'-0300' }}</td>
-                <td>{{ funcion.fin | date:'dd/MM/yyyy HH:mm':'-0300' }}</td>
-                <td>{{ funcion.fin_ocupacion | date:'dd/MM/yyyy HH:mm':'-0300' }}</td>
+                <td>{{ funcion.inicio | date: 'dd/MM/yyyy HH:mm' : '-0300' }}</td>
+                <td>{{ funcion.fin | date: 'dd/MM/yyyy HH:mm' : '-0300' }}</td>
+                <td>{{ funcion.fin_ocupacion | date: 'dd/MM/yyyy HH:mm' : '-0300' }}</td>
                 <td>{{ funcion.formato }}</td>
                 <td>{{ funcion.idioma }}</td>
                 <td>ARS {{ funcion.precio_base }}</td>

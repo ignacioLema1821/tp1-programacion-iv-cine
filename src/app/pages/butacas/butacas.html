@@ -1,7 +1,5 @@
 <section>
-  <a class="volver" routerLink="/cartelera">
-    ← Volver a la cartelera
-  </a>
+  <a class="volver" routerLink="/cartelera"> ← Volver a la cartelera </a>
 
   @if (cargando()) {
     <p role="status">Cargando plano de la sala...</p>
@@ -9,9 +7,7 @@
     <div class="aviso" role="alert">
       <p>{{ mensajeError() }}</p>
 
-      <button type="button" (click)="cargarDatos()">
-        Reintentar
-      </button>
+      <button type="button" (click)="cargarDatos()">Reintentar</button>
     </div>
   } @else if (funcion(); as actual) {
     <header class="encabezado">
@@ -19,36 +15,28 @@
       <h3>{{ actual.pelicula?.nombre }}</h3>
 
       <p>
-        {{ actual.sala?.nombre }} ·
-        {{ actual.inicio | date:'dd/MM/yyyy HH:mm':'-0300' }} h ·
+        {{ actual.sala?.nombre }} · {{ actual.inicio | date: 'dd/MM/yyyy HH:mm' : '-0300' }} h ·
         {{ actual.formato }} ·
         {{ actual.idioma === 'castellano' ? 'Castellano' : 'Subtitulada' }}
       </p>
 
       <p>
         Entrada común y accesible:
-        {{ mostrarPrecio(actual.precio_base) }}.
-        VIP: {{ actual.sala?.recargo_vip }} % adicional.
+        {{ mostrarPrecio(actual.precio_base) }}. VIP: {{ actual.sala?.recargo_vip }} % adicional.
         Horario de Argentina.
       </p>
 
-      <a
-        class="volver"
-        [routerLink]="['/cartelera', actual.pelicula_id, 'funciones']"
-      >
+      <a class="volver" [routerLink]="['/cartelera', actual.pelicula_id, 'funciones']">
         Cambiar de horario
       </a>
     </header>
 
     @if (funcionComenzada()) {
-      <p class="aviso" role="alert">
-        Esta función ya comenzó. Elegí otro horario para continuar.
-      </p>
+      <p class="aviso" role="alert">Esta función ya comenzó. Elegí otro horario para continuar.</p>
     } @else {
       <p class="ayuda">
-        Tocá una butaca para elegirla; tocala otra vez para quitarla.
-        J es la fila accesible que ocupa el antiguo espacio de J y K.
-        Las filas R, S y T son VIP.
+        Tocá una butaca para elegirla; tocala otra vez para quitarla. J es la fila accesible que
+        ocupa el antiguo espacio de J y K. Las filas R, S y T son VIP.
       </p>
 
       <ul class="leyenda" aria-label="Tipos y estados de butacas">
@@ -71,9 +59,7 @@
       </ul>
 
       <!-- En pantallas pequeñas se desplaza el plano, sin desarmar las filas. -->
-      <p id="ayuda-plano" class="ayuda">
-        Si el plano no entra, deslizalo horizontalmente.
-      </p>
+      <p id="ayuda-plano" class="ayuda">Si el plano no entra, deslizalo horizontalmente.</p>
 
       <div
         class="plano-contenedor"
@@ -86,22 +72,13 @@
           <div class="pantalla">PANTALLA</div>
 
           @for (fila of filas(); track fila.letra) {
-            <div
-              class="fila"
-              [class.fila-accesible]="fila.accesible"
-            >
-              <span
-                class="letra"
-                [attr.title]="fila.accesible ? 'Fila accesible J/K' : null"
-              >
+            <div class="fila" [class.fila-accesible]="fila.accesible">
+              <span class="letra" [attr.title]="fila.accesible ? 'Fila accesible J/K' : null">
                 {{ fila.letra }}
               </span>
 
               @for (bloque of fila.bloques; track bloque.numero) {
-                <div
-                  class="bloque"
-                  [class.central]="bloque.numero === 2"
-                >
+                <div class="bloque" [class.central]="bloque.numero === 2">
                   @for (butaca of bloque.butacas; track butaca.id) {
                     <button
                       type="button"
@@ -109,9 +86,27 @@
                       [class.accesible]="butaca.tipo === 'accesible'"
                       [class.vip]="butaca.tipo === 'vip'"
                       [class.seleccionada]="estaSeleccionada(butaca)"
+                      [class.ocupada]="ocupadas().includes(butaca.id)"
+                      [disabled]="
+                        comprando() || !disponibilidadLista() || ocupadas().includes(butaca.id)
+                      "
                       [attr.aria-pressed]="estaSeleccionada(butaca)"
-                      [attr.aria-label]="butaca.fila + butaca.numero + ', ' + nombreTipo(butaca) + ', ' + mostrarPrecio(precioButaca(butaca))"
-                      [title]="butaca.fila + butaca.numero + ' · ' + nombreTipo(butaca) + ' · ' + mostrarPrecio(precioButaca(butaca))"
+                      [attr.aria-label]="
+                        butaca.fila +
+                        butaca.numero +
+                        ', ' +
+                        nombreTipo(butaca) +
+                        ', ' +
+                        mostrarPrecio(precioButaca(butaca))
+                      "
+                      [title]="
+                        butaca.fila +
+                        butaca.numero +
+                        ' · ' +
+                        nombreTipo(butaca) +
+                        ' · ' +
+                        mostrarPrecio(precioButaca(butaca))
+                      "
                       (click)="alternarButaca(butaca)"
                     >
                       <span>{{ butaca.numero }}</span>
@@ -128,7 +123,7 @@
         </div>
       </div>
 
-      <!-- Este resumen todavía no guarda una compra ni bloquea asientos. -->
+      <!-- La compra se confirma en Supabase; elegir una butaca todavía no la reserva. -->
       <aside class="resumen" aria-label="Resumen de selección">
         <h3>Tu selección</h3>
 
@@ -159,20 +154,125 @@
             }
           </ul>
 
-          <button type="button" (click)="limpiarSeleccion()">
-            Limpiar selección
-          </button>
+          <button type="button" (click)="limpiarSeleccion()">Limpiar selección</button>
         }
 
         <p class="total" role="status">
-          {{ seleccionadas().length }} butacas ·
-          Total estimado: {{ mostrarPrecio(total()) }}
+          {{ seleccionadas().length }} butacas · Total estimado: {{ mostrarPrecio(total()) }}
         </p>
 
-        <p class="ayuda">
-          La selección no reserva lugares.
-          La compra todavía no está habilitada.
-        </p>
+        <p>La selección no reserva lugares. Las butacas ocupadas se muestran deshabilitadas.</p>
+        @if (avisoDisponibilidad()) {
+          <p role="alert">{{ avisoDisponibilidad() }}</p>
+        }
+        @if (errorCompra()) {
+          <p class="error" role="alert">{{ errorCompra() }}</p>
+        }
+        <button
+          type="button"
+          (click)="prepararCompra()"
+          [disabled]="comprando() || !disponibilidadLista() || seleccionadas().length === 0"
+        >
+          Continuar con la compra
+        </button>
+        @if (mostrarCompra()) {
+          <form #formularioCompra="ngForm" (ngSubmit)="confirmarCompra(formularioCompra)">
+            <fieldset [disabled]="comprando()">
+              <legend>Confirmar compra</legend>
+              <p>Pago simulado para el trabajo práctico. No ingreses datos de tarjetas.</p>
+              <label for="correo-compra">Correo para identificar tu compra</label>
+              <input
+                id="correo-compra"
+                name="correo"
+                type="email"
+                [(ngModel)]="correo"
+                required
+                email
+              />
+              @if (!auth.usuario()) {
+                <label for="nacimiento-compra"
+                  >Fecha de nacimiento (necesaria si hay restricción de edad)</label
+                >
+                <input
+                  id="nacimiento-compra"
+                  name="nacimiento"
+                  type="date"
+                  [(ngModel)]="nacimiento"
+                />
+                <p>
+                  Podés comprar sin cuenta. Registrarte habilita descuentos, puntos y crédito por
+                  cancelaciones.
+                </p>
+              }
+              @if (descuento() > 0) {
+                <p>Descuento de bienvenida: {{ descuento() }} %.</p>
+              }
+              @if (credito() > 0) {
+                <label
+                  ><input name="usarCredito" type="checkbox" [(ngModel)]="usarCredito" /> Usar mi
+                  crédito ({{ mostrarPrecio(credito()) }})</label
+                >
+              }
+              <h3>Candy opcional</h3>
+              @for (producto of productos(); track producto.id) {
+                <label
+                  >{{ producto.nombre }} · {{ mostrarPrecio(producto.precio) }}
+                  <input
+                    [name]="'producto-' + producto.id"
+                    type="number"
+                    min="0"
+                    max="99"
+                    step="1"
+                    [(ngModel)]="cantidades[producto.id]"
+                  />
+                </label>
+              }
+              <h3>Combos destacados</h3>
+              <label
+                >Entrada + pochoclo + bebida (un combo por compra)
+                <select name="combo" [(ngModel)]="comboId">
+                  <option [ngValue]="null">Sin combo</option>
+                  @for (combo of combos(); track combo.id) {
+                    <option [ngValue]="combo.id">
+                      {{ combo.nombre }} · ARS {{ combo.precio }}
+                    </option>
+                  }
+                </select>
+              </label>
+              <p>El combo incluye una entrada. Si esa entrada es VIP, se agrega su recargo.</p>
+              @if (auth.usuario()) {
+                <label>Cupón<input name="cupon" [(ngModel)]="cupon" maxlength="30" /></label>
+                <p>Se aplica el mayor porcentaje válido entre el cupón y la bienvenida.</p>
+                <label
+                  >Canjear puntos (saldo: {{ puntos() }})
+                  <select name="recompensa" [(ngModel)]="recompensaId">
+                    <option [ngValue]="null">Sin canje</option>
+                    @for (r of recompensas(); track r.id) {
+                      <option [ngValue]="r.id" [disabled]="r.costo_puntos > puntos()">
+                        {{ r.nombre }} · {{ r.costo_puntos }} puntos
+                      </option>
+                    }
+                  </select>
+                </label>
+                <p>Elegí combo o canje. Para canjear candy, agregá ese producto al carrito.</p>
+              }
+              <p>Total estimado con descuento: {{ mostrarPrecio(totalConDescuento()) }}</p>
+              <p>Pago simulado estimado: {{ mostrarPrecio(pagoEstimado()) }}</p>
+              <label
+                ><input
+                  name="simulacion"
+                  type="checkbox"
+                  [(ngModel)]="confirmarSimulacion"
+                  required
+                />
+                Confirmo esta compra con pago simulado.</label
+              >
+              <button type="submit">
+                {{ comprando() ? 'Procesando...' : 'Confirmar compra simulada' }}
+              </button>
+            </fieldset>
+          </form>
+        }
       </aside>
     }
   }

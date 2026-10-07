@@ -1,0 +1,45 @@
+h2 {
+  color: #a99bff;
+}
+form {
+  max-width: 700px;
+  margin: 24px 0;
+  padding: 24px;
+  background: #1d1d2b;
+  border-radius: 16px;
+  border: 1px solid #39394d;
+}
+label {
+  display: block;
+  margin: 16px 0 8px;
+}
+input:not([type='checkbox']),
+select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  background: #101018;
+  color: #f5f5fa;
+  border: 1px solid #686880;
+  border-radius: 8px;
+  font: inherit;
+}
+button {
+  margin: 12px 8px 0 0;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #a99bff;
+  color: #101018;
+  font: inherit;
+  cursor: pointer;
+}
+li {
+  margin: 12px 0;
+}
+.error {
+  color: #ffb4b4;
+}
+.exito {
+  color: #a7efbb;
+}

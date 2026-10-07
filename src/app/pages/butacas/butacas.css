@@ -243,3 +243,35 @@ a:focus-visible,
     padding: 16px;
   }
 }
+/* Las vendidas conservan su lugar en el plano, pero no se pueden elegir. */
+.butaca.ocupada {
+  background: #484854;
+  color: #c7c7cf;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+form {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #686880;
+  border-radius: 12px;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+}
+label {
+  display: block;
+  margin-top: 16px;
+}
+input:not([type='checkbox']) {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  color: #f5f5fa;
+  background: #101018;
+  border: 1px solid #686880;
+  border-radius: 8px;
+  font: inherit;
+  color-scheme: dark;
+}

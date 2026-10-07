@@ -11,7 +11,7 @@ import { FuncionesService } from '../../services/funciones.service';
   standalone: true,
   imports: [FormsModule, DatePipe],
   templateUrl: './admin-funciones.html',
-  styleUrl: './admin-funciones.css'
+  styleUrl: './admin-funciones.css',
 })
 export class AdminFunciones implements OnInit {
   private peliculasService = inject(PeliculasService);
@@ -32,6 +32,10 @@ export class AdminFunciones implements OnInit {
   funcionAEliminar = signal<Funcion | null>(null);
 
   peliculaId: number | null = null;
+  repetir = false;
+  fechaHasta = '';
+  diasSeleccionados: number[] = [];
+  diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   fecha = '';
   hora = '';
   formato = '2D';
@@ -71,32 +75,19 @@ export class AdminFunciones implements OnInit {
     this.mensajeExito.set('');
     this.funcionAEliminar.set(null);
 
-    if (
-      formulario.invalid ||
-      this.peliculaId === null ||
-      this.precio === null
-    ) {
+    if (formulario.invalid || this.peliculaId === null || this.precio === null) {
       this.mensajeError.set('Completá todos los campos correctamente.');
       return;
     }
 
-    if (
-      !Number.isFinite(this.precio) ||
-      this.precio <= 0 ||
-      this.precio > 99999999.99
-    ) {
+    if (!Number.isFinite(this.precio) || this.precio <= 0 || this.precio > 99999999.99) {
       this.mensajeError.set('Ingresá un precio válido mayor que cero.');
       return;
     }
 
-    const inicio = new Date(
-      `${this.fecha}T${this.hora}:00-03:00`
-    );
+    const inicio = new Date(`${this.fecha}T${this.hora}:00-03:00`);
 
-    if (
-      Number.isNaN(inicio.getTime()) ||
-      inicio.getTime() <= Date.now()
-    ) {
+    if (Number.isNaN(inicio.getTime()) || inicio.getTime() <= Date.now()) {
       this.mensajeError.set('Elegí una fecha y hora futuras.');
       return;
     }
@@ -104,12 +95,27 @@ export class AdminFunciones implements OnInit {
     this.guardando.set(true);
 
     try {
+      if (this.repetir) {
+        const cantidad = await this.funcionesService.programarPeriodo(
+          this.peliculaId,
+          this.fecha,
+          this.fechaHasta,
+          this.hora,
+          this.diasSeleccionados,
+          this.formato,
+          this.idioma,
+          this.precio,
+        );
+        await this.cargarDatos();
+        this.mensajeExito.set('Se programaron ' + cantidad + ' funciones.');
+        return;
+      }
       const funcionId = await this.funcionesService.programarFuncion(
         this.peliculaId,
         inicio.toISOString(),
         this.formato,
         this.idioma,
-        this.precio
+        this.precio,
       );
 
       formulario.resetForm({
@@ -118,21 +124,17 @@ export class AdminFunciones implements OnInit {
         hora: '',
         formato: '2D',
         idioma: 'castellano',
-        precio: null
+        precio: null,
       });
 
       this.mensajeExito.set('La función se programó correctamente.');
 
       await this.cargarDatos();
 
-      const funcionCreada = this.funciones().find(
-        funcion => funcion.id === funcionId
-      );
+      const funcionCreada = this.funciones().find((funcion) => funcion.id === funcionId);
 
       if (funcionCreada && funcionCreada.sala) {
-        this.mensajeExito.set(
-          `Función programada correctamente en ${funcionCreada.sala.nombre}.`
-        );
+        this.mensajeExito.set(`Función programada correctamente en ${funcionCreada.sala.nombre}.`);
       }
     } catch (error) {
       console.error('Error al programar la función:', error);
@@ -144,17 +146,14 @@ export class AdminFunciones implements OnInit {
         'Solo el administrador puede programar funciones.',
         'El formato no es válido.',
         'El idioma no es válido.',
-        'El precio debe ser un número mayor que cero.'
+        'El precio debe ser un número mayor que cero.',
       ];
 
-      if (
-        error instanceof Error &&
-        mensajesConocidos.includes(error.message)
-      ) {
+      if (error instanceof Error && mensajesConocidos.includes(error.message)) {
         this.mensajeError.set(error.message);
       } else {
         this.mensajeError.set(
-          'No pudimos programar la función. Revisá los datos e intentá nuevamente.'
+          'No pudimos programar la función. Revisá los datos e intentá nuevamente.',
         );
       }
     } finally {
@@ -207,21 +206,21 @@ export class AdminFunciones implements OnInit {
 
       const mensajesConocidos = [
         'Solo el administrador puede eliminar funciones.',
-        'La función no existe o ya comenzó.'
+        'La función no existe o ya comenzó.',
       ];
 
-      if (
-        error instanceof Error &&
-        mensajesConocidos.includes(error.message)
-      ) {
+      if (error instanceof Error && mensajesConocidos.includes(error.message)) {
         this.mensajeError.set(error.message);
       } else {
-        this.mensajeError.set(
-          'No pudimos eliminar la función. Intentá nuevamente.'
-        );
+        this.mensajeError.set('No pudimos eliminar la función. Intentá nuevamente.');
       }
     } finally {
       this.eliminando.set(false);
     }
+  }
+  cambiarDia(dia: number): void {
+    if (this.diasSeleccionados.includes(dia))
+      this.diasSeleccionados = this.diasSeleccionados.filter((d) => d !== dia);
+    else this.diasSeleccionados.push(dia);
   }
 }

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
+  <rect width="400" height="600" rx="20" fill="#171725"/>
+  <circle cx="200" cy="230" r="92" fill="none" stroke="#a99bff" stroke-width="22"/>
+  <path d="M175 174 L175 286 L264 230 Z" fill="#a99bff"/>
+  <text x="200" y="405" text-anchor="middle" fill="#f5f5fa" font-family="Arial, sans-serif" font-size="34">CineApp</text>
+  <text x="200" y="452" text-anchor="middle" fill="#c4c4d4" font-family="Arial, sans-serif" font-size="20">Imagen pendiente</text>
+</svg>

@@ -85,3 +85,12 @@ header .error {
 main {
   padding-top: 24px;
 }
+.notificaciones {
+  padding: 12px 20px;
+  margin: 20px 0;
+  background: #253b30;
+  border-radius: 12px;
+}
+.notificaciones a {
+  color: #c1f0d3;
+}

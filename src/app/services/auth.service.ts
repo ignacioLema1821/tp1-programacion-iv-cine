@@ -4,7 +4,7 @@ import { SupabaseService } from './supabase.service';
 import { DatosRegistro } from '../models/datos-registro';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private supabaseService = inject(SupabaseService);
@@ -22,17 +22,15 @@ export class AuthService {
 
   constructor() {
     // Este callback solamente actualiza el usuario y el estado de sesión.
-    this.supabaseService.cliente.auth.onAuthStateChange(
-      (_evento, sesion) => {
-        if (sesion) {
-          this.usuario.set(sesion.user);
-        } else {
-          this.usuario.set(null);
-        }
-
-        this.cargandoSesion.set(false);
+    this.supabaseService.cliente.auth.onAuthStateChange((_evento, sesion) => {
+      if (sesion) {
+        this.usuario.set(sesion.user);
+      } else {
+        this.usuario.set(null);
       }
-    );
+
+      this.cargandoSesion.set(false);
+    });
 
     // Cuando cambia el usuario, consultamos su rol fuera del callback de Auth.
     effect(() => {
@@ -89,9 +87,7 @@ export class AuthService {
       if (numeroConsulta === this.numeroConsultaRol) {
         console.error('Error al consultar el rol:', error);
 
-        this.errorRol.set(
-          'No pudimos consultar tu perfil. Recargá la página para reintentar.'
-        );
+        this.errorRol.set('No pudimos consultar tu perfil. Recargá la página para reintentar.');
       }
     } finally {
       if (numeroConsulta === this.numeroConsultaRol) {
@@ -100,10 +96,7 @@ export class AuthService {
     }
   }
 
-  async registrar(
-    datos: DatosRegistro,
-    password: string
-  ): Promise<boolean> {
+  async registrar(datos: DatosRegistro, password: string): Promise<boolean> {
     const respuesta = await this.supabaseService.cliente.auth.signUp({
       email: datos.email.trim(),
       password: password,
@@ -114,9 +107,9 @@ export class AuthService {
           fecha_nacimiento: datos.fechaNacimiento,
           tipo_sangre: datos.tipoSangre,
           color_ojos: datos.colorOjos.trim(),
-          dias_vacaciones: datos.diasVacaciones
-        }
-      }
+          dias_vacaciones: datos.diasVacaciones,
+        },
+      },
     });
 
     if (respuesta.error) {
@@ -127,11 +120,10 @@ export class AuthService {
   }
 
   async iniciarSesion(email: string, password: string): Promise<void> {
-    const respuesta =
-      await this.supabaseService.cliente.auth.signInWithPassword({
-        email: email.trim(),
-        password: password
-      });
+    const respuesta = await this.supabaseService.cliente.auth.signInWithPassword({
+      email: email.trim(),
+      password: password,
+    });
 
     if (respuesta.error) {
       throw respuesta.error;
@@ -140,7 +132,7 @@ export class AuthService {
 
   async cerrarSesion(): Promise<void> {
     const respuesta = await this.supabaseService.cliente.auth.signOut({
-      scope: 'local'
+      scope: 'local',
     });
 
     if (respuesta.error) {

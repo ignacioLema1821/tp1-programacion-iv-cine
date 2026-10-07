@@ -9,8 +9,7 @@ export const adminGuard: CanActivateFn = async () => {
 
   try {
     // Comprobamos el usuario con Supabase.
-    const respuestaUsuario =
-      await supabaseService.cliente.auth.getUser();
+    const respuestaUsuario = await supabaseService.cliente.auth.getUser();
 
     if (respuestaUsuario.error || !respuestaUsuario.data.user) {
       return router.createUrlTree(['/login']);

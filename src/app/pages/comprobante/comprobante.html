@@ -1,0 +1,43 @@
+<section>
+  <h2>Tu comprobante</h2>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (compra(); as actual) {
+    <h3>{{ actual.pelicula_nombre }}</h3>
+    <p>{{ actual.sala_nombre }} · {{ actual.inicio | date: 'dd/MM/yyyy HH:mm' : '-0300' }} h</p>
+    <p>Estado: {{ actual.estado }} · Pago simulado</p>
+    @if (actual.edad_minima > 0) {
+      <p>Edad mínima: {{ actual.edad_minima }} años. Debe asistir un adulto.</p>
+    }
+    <ul>
+      @for (entrada of actual.entradas; track entrada.fila + entrada.numero) {
+        <li>
+          {{ entrada.fila }}{{ entrada.numero }} · {{ entrada.tipo }} · ARS {{ entrada.precio }}
+        </li>
+      }
+    </ul>
+    <h3>Candy</h3>
+    <ul>
+      @for (producto of actual.candy; track $index) {
+        <li>{{ producto.cantidad }} × {{ producto.nombre }}</li>
+      } @empty {
+        <li>Sin productos de candy.</li>
+      }
+    </ul>
+    <p>Descuento: ARS {{ actual.descuento }} · Total: ARS {{ actual.total }}</p>
+    <p>
+      Crédito utilizado: ARS {{ actual.credito_usado }} · Pago simulado: ARS
+      {{ actual.pago_simulado }}
+    </p>
+    @if (actual.estado === 'pagada') {
+      <img [src]="imagenQr()" alt="Código QR de la entrada" width="240" height="240" />
+      <p class="codigo">{{ actual.codigo }}</p>
+      <p>Conservá este enlace y el código en privado: permiten abrir tu comprobante.</p>
+      <button (click)="descargar()" [disabled]="descargando()">Descargar PDF</button>
+    }
+  } @else if (!error()) {
+    <p role="status">Cargando comprobante...</p>
+  }
+  <a routerLink="/cartelera">Volver a la cartelera</a>
+</section>

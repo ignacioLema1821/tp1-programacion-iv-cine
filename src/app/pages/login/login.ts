@@ -9,7 +9,7 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrl: './login.css',
 })
 export class Login {
   private authService = inject(AuthService);
@@ -48,22 +48,14 @@ export class Login {
 
       if (error instanceof AuthError) {
         if (error.code === 'email_not_confirmed') {
-          this.mensajeError.set(
-            'Tenés que confirmar tu correo antes de iniciar sesión.'
-          );
+          this.mensajeError.set('Tenés que confirmar tu correo antes de iniciar sesión.');
         } else if (error.code === 'invalid_credentials') {
-          this.mensajeError.set(
-            'El correo o la contraseña no son correctos.'
-          );
+          this.mensajeError.set('El correo o la contraseña no son correctos.');
         } else {
-          this.mensajeError.set(
-            'No pudimos iniciar sesión. Intentá nuevamente.'
-          );
+          this.mensajeError.set('No pudimos iniciar sesión. Intentá nuevamente.');
         }
       } else {
-        this.mensajeError.set(
-          'No pudimos conectarnos. Revisá tu conexión e intentá nuevamente.'
-        );
+        this.mensajeError.set('No pudimos conectarnos. Revisá tu conexión e intentá nuevamente.');
       }
     } finally {
       this.cargando.set(false);

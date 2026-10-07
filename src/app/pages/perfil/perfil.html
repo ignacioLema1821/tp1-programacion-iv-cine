@@ -1,0 +1,88 @@
+<section>
+  <h2>Mi perfil</h2>
+  @if (auth.usuario(); as usuario) {
+    <p>
+      {{ usuario.user_metadata['nombre'] }} {{ usuario.user_metadata['apellido'] }} ·
+      {{ usuario.email }}
+    </p>
+    <p>Puntos: {{ saldo().puntos }} · Crédito: ARS {{ saldo().credito }}</p>
+    <p>Las cancelaciones generan crédito para compras futuras; no devuelven dinero.</p>
+    @if (cargando()) {
+      <p role="status">Cargando tus compras...</p>
+    }
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+    @if (aCancelar(); as compra) {
+      <div class="confirmacion">
+        <p>¿Cancelar {{ compra.pelicula_nombre }} y recibir ARS {{ compra.total }} de crédito?</p>
+        <button (click)="cancelar()" [disabled]="cancelando()">Confirmar cancelación</button>
+        <button (click)="aCancelar.set(null)" [disabled]="cancelando()">Volver</button>
+      </div>
+    }
+    <h3>Alertas de venta</h3>
+    <button (click)="cargar()" [disabled]="cargando()">Actualizar perfil y alertas</button>
+    @for (alerta of alertas(); track alerta.pelicula_id) {
+      <p>
+        {{ alerta.nombre }} ·
+        {{ alerta.disponible ? '¡Entradas disponibles!' : 'Esperando apertura de venta' }}
+        @if (alerta.disponible) {
+          <a [routerLink]="['/cartelera', alerta.pelicula_id, 'funciones']">Ver horarios</a>
+        }
+      </p>
+    } @empty {
+      <p>No activaste alertas.</p>
+    }
+    <h3>Mis películas</h3>
+    <div class="vistas">
+      @for (pelicula of vistas(); track pelicula.compra_id) {
+        <article>
+          <img
+            [src]="pelicula.imagen || '/posters/default.svg'"
+            [alt]="pelicula.nombre"
+            width="120"
+            height="180"
+          />
+          <h4>{{ pelicula.nombre }}</h4>
+          <p>
+            {{ pelicula.fecha | date: 'dd/MM/yyyy' }} · Mi calificación:
+            {{ pelicula.estrellas || 'Sin calificar' }}
+          </p>
+          <a [routerLink]="['/cartelera', pelicula.pelicula_id, 'funciones']"
+            >Ver o escribir reseña</a
+          >
+        </article>
+      } @empty {
+        <p>Tu historial se completa con entradas validadas de funciones que ya comenzaron.</p>
+      }
+    </div>
+    <h3>Historial de canjes</h3>
+    <ul>
+      @for (canje of canjes(); track canje.id) {
+        <li>
+          {{ canje.nombre }} · {{ canje.puntos }} puntos · {{ canje.fecha | date: 'dd/MM/yyyy' }} ·
+          {{ canje.anulado ? 'Anulado' : 'Aplicado' }}
+        </li>
+      } @empty {
+        <li>Todavía no canjeaste puntos.</li>
+      }
+    </ul>
+    <h3>Mis compras</h3>
+    @for (compra of historial(); track compra.id) {
+      <article>
+        <h3>{{ compra.pelicula_nombre }}</h3>
+        <p>{{ compra.sala_nombre }} · {{ compra.inicio | date: 'dd/MM/yyyy HH:mm' : '-0300' }}</p>
+        <p>{{ compra.estado }} · ARS {{ compra.total }}</p>
+        <a [routerLink]="['/comprobante', compra.codigo]">Ver comprobante</a>
+        @if (puedeCancelar(compra)) {
+          <button (click)="aCancelar.set(compra)" [disabled]="cancelando()">Cancelar compra</button>
+        }
+      </article>
+    } @empty {
+      <p>Todavía no tenés compras.</p>
+    }
+  } @else {
+    <p>Iniciá sesión para consultar tu perfil.</p>
+    <a routerLink="/login">Iniciar sesión</a>
+  }
+</section>

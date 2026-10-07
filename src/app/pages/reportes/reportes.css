@@ -1,0 +1,66 @@
+h2 {
+  color: #a99bff;
+}
+form {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+label {
+  display: block;
+}
+input {
+  display: block;
+  padding: 12px;
+  background: #101018;
+  color: #f5f5fa;
+  border: 1px solid #686880;
+  border-radius: 8px;
+  font: inherit;
+  color-scheme: dark;
+}
+button {
+  margin: 12px 8px 0 0;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #a99bff;
+  color: #101018;
+  font: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.6;
+}
+.tabla {
+  overflow-x: auto;
+  margin-top: 24px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1d1d2b;
+}
+th,
+td {
+  padding: 12px;
+  border-bottom: 1px solid #39394d;
+  text-align: left;
+}
+pre {
+  max-width: 500px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.grafico {
+  margin: 16px 0;
+}
+.barra {
+  height: 20px;
+  background: #a99bff;
+  border-radius: 4px;
+}
+.error {
+  color: #ffb4b4;
+}

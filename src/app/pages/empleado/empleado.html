@@ -1,0 +1,28 @@
+<section>
+  <h2>Validación de entradas</h2>
+  <p>
+    Ingresá el código del comprobante. Cine y candy se validan por separado una sola vez, usando el
+    mismo código.
+  </p>
+  <button type="button" (click)="abrirCamara()" [disabled]="escaneando() || procesando()">
+    Escanear QR con cámara
+  </button>
+  <button type="button" (click)="detenerCamara()" [disabled]="!escaneando()">Detener cámara</button>
+  <video #video [hidden]="!escaneando()" muted playsinline width="320"></video>
+  <form #formulario="ngForm" (ngSubmit)="validar(formulario)">
+    <label for="sector">Sector</label>
+    <select id="sector" name="sector" [(ngModel)]="sector">
+      <option value="cine">Cine</option>
+      <option value="candy">Candy</option>
+    </select>
+    <label for="codigo">Código de la entrada</label>
+    <input id="codigo" name="codigo" [(ngModel)]="codigo" required [disabled]="procesando()" />
+    <button type="submit" [disabled]="procesando()">Validar código</button>
+  </form>
+  @if (mensaje()) {
+    <p class="exito" role="status">{{ mensaje() }}</p>
+  }
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+</section>

@@ -1,6 +1,8 @@
 <section>
   <h2>Cartelera</h2>
-  <p>Elegí tu próxima película.</p>
+  <p>
+    Elegí tu próxima película. Primero mostramos las tres más vendidas y después las destacadas.
+  </p>
 
   @if (cargando()) {
     <p role="status">Cargando películas...</p>
@@ -8,22 +10,23 @@
     <div role="alert">
       <p>{{ mensajeError() }}</p>
 
-      <button type="button" (click)="cargarPeliculas()">
-        Reintentar
-      </button>
+      <button type="button" (click)="cargarPeliculas()">Reintentar</button>
     </div>
   } @else {
     <div class="filtros">
       <div class="campo">
+        <label for="seccion">Sección</label>
+        <select id="seccion" [(ngModel)]="seccion">
+          <option value="todas">Todas las películas</option>
+          <option value="actuales">En cartelera</option>
+          <option value="proximamente">Próximamente</option>
+        </select>
+      </div>
+      <div class="campo">
         <label for="busqueda">Buscar por nombre</label>
 
         <!-- ngModel conecta el campo con la propiedad del componente. -->
-        <input
-          id="busqueda"
-          type="search"
-          placeholder="Ejemplo: Coco"
-          [(ngModel)]="busqueda"
-        />
+        <input id="busqueda" type="search" placeholder="Ejemplo: Coco" [(ngModel)]="busqueda" />
       </div>
 
       <div class="campo">
@@ -38,18 +41,33 @@
         </select>
       </div>
 
-      <button type="button" (click)="limpiarFiltros()">
-        Limpiar filtros
-      </button>
+      <button type="button" (click)="limpiarFiltros()">Limpiar filtros</button>
     </div>
 
-    <p class="resultados" role="status">
-      Películas encontradas: {{ peliculasFiltradas.length }}
-    </p>
+    <p class="resultados" role="status">Películas encontradas: {{ peliculasFiltradas.length }}</p>
 
     <div class="peliculas">
       @for (pelicula of peliculasFiltradas; track pelicula.id) {
         <article class="pelicula">
+          <img
+            class="poster"
+            [src]="pelicula.imagen || '/posters/default.svg'"
+            [alt]="'Póster de ' + pelicula.nombre"
+            loading="lazy"
+          />
+          @if (pelicula.destacada) {
+            <span class="etiqueta">Destacada</span>
+          }
+          @if (pelicula.estreno && pelicula.estreno > fechaHoy) {
+            <span class="etiqueta">Próximamente · {{ pelicula.estreno }}</span>
+          }
+          @if (pelicula.vendidas > 0) {
+            <p>{{ pelicula.vendidas }} entradas vendidas</p>
+          }
+          <p>
+            Edad mínima:
+            {{ pelicula.edad_minima === 0 ? 'Sin restricción' : pelicula.edad_minima + ' años' }}
+          </p>
           <h3>{{ pelicula.nombre }}</h3>
 
           <p class="detalle">

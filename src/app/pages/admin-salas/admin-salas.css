@@ -1,0 +1,177 @@
+section {
+  max-width: 1000px;
+}
+
+h2 {
+  color: #a99bff;
+}
+
+h3 {
+  margin: 32px 0 16px;
+}
+
+p {
+  line-height: 1.5;
+}
+
+form {
+  box-sizing: border-box;
+  margin: 24px 0;
+  padding: 24px;
+  border: 1px solid #39394d;
+  border-radius: 16px;
+  background: #1d1d2b;
+}
+
+form h3 {
+  margin: 0 0 20px;
+}
+
+label {
+  display: block;
+  margin: 16px 0 8px;
+}
+
+input:not([type='checkbox']),
+select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #686880;
+  border-radius: 8px;
+  background: #101018;
+  color: #f5f5fa;
+  font: inherit;
+  color-scheme: dark;
+}
+
+label > input:not([type='checkbox']),
+label > select {
+  display: block;
+  margin-top: 8px;
+}
+
+input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+  accent-color: #a99bff;
+}
+
+button {
+  padding: 12px 18px;
+  border: 1px solid #a99bff;
+  border-radius: 8px;
+  background: #a99bff;
+  color: #101018;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+form > button {
+  margin-top: 16px;
+}
+
+button:not(:disabled):hover {
+  filter: brightness(1.1);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid #a99bff;
+  outline-offset: 3px;
+}
+
+/* Cada sala aparece en una fila con el botón separado. */
+ul {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid #39394d;
+  border-radius: 12px;
+  background: #1d1d2b;
+}
+
+/* Estas son las filas de usuarios que ya existen en el HTML. */
+section > div:not(.butacas) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px auto;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 20px;
+  border: 1px solid #39394d;
+  border-radius: 12px;
+  background: #1d1d2b;
+}
+
+section > div:not(.butacas) > span {
+  overflow-wrap: anywhere;
+}
+
+/* El listado de butacas mantiene su propio espacio con desplazamiento. */
+.butacas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.butacas:empty {
+  display: none;
+}
+
+.butacas:not(:empty) {
+  padding: 16px;
+  border: 1px solid #39394d;
+  border-radius: 12px;
+  background: #1d1d2b;
+}
+
+.butacas button {
+  min-width: 52px;
+  padding: 10px 8px;
+}
+
+.error {
+  color: #ffb4b4;
+}
+
+.exito,
+p[role='status'] {
+  color: #a7efbb;
+}
+
+/* En pantallas pequeñas, los datos del usuario se apilan. */
+@media (max-width: 760px) {
+  section > div:not(.butacas) {
+    grid-template-columns: 1fr;
+  }
+
+  form {
+    padding: 16px;
+  }
+
+  li {
+    flex-wrap: wrap;
+  }
+}

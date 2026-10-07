@@ -1,0 +1,40 @@
+<section>
+  <h3>Reseñas · Promedio {{ datos().promedio }} / 5</h3>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @for (resena of datos().resenas; track $index) {
+    <article>
+      <strong>{{ resena.estrellas }} ★</strong>
+      <p>{{ resena.comentario }}</p>
+      <small>{{ resena.fecha | date: 'dd/MM/yyyy' }}</small>
+    </article>
+  } @empty {
+    <p>Todavía no hay reseñas.</p>
+  }
+  @if (auth.usuario()) {
+    <form #formulario="ngForm" (ngSubmit)="guardar(formulario)">
+      <label
+        >Estrellas<select name="estrellas" [(ngModel)]="estrellas">
+          <option [ngValue]="1">1</option>
+          <option [ngValue]="2">2</option>
+          <option [ngValue]="3">3</option>
+          <option [ngValue]="4">4</option>
+          <option [ngValue]="5">5</option>
+        </select></label
+      >
+      <label
+        >Comentario<textarea
+          name="comentario"
+          [(ngModel)]="comentario"
+          required
+          maxlength="300"
+        ></textarea>
+      </label>
+      <button [disabled]="guardando()">Guardar mi reseña</button>
+      <p>Tu nueva reseña reemplaza la anterior para esta película.</p>
+    </form>
+  } @else {
+    <p>Iniciá sesión para dejar tu reseña.</p>
+  }
+</section>

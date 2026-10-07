@@ -4,21 +4,22 @@
     <p>Tu próxima película empieza acá.</p>
 
     <nav aria-label="Navegación principal">
-      <a
-        routerLink="/cartelera"
-        routerLinkActive="activo"
-        ariaCurrentWhenActive="page"
-      >
+      <a routerLink="/cartelera" routerLinkActive="activo" ariaCurrentWhenActive="page">
         Cartelera
       </a>
 
       @if (authService.cargandoSesion()) {
-        <span class="usuario" role="status">
-          Comprobando sesión...
-        </span>
+        <span class="usuario" role="status"> Comprobando sesión... </span>
       } @else {
         @if (authService.usuario()) {
+          <a routerLink="/perfil" routerLinkActive="activo">Mi perfil</a>
+          @if (authService.rol() === 'empleado' || authService.rol() === 'admin') {
+            <a routerLink="/empleado" routerLinkActive="activo">Validar entradas</a>
+          }
           @if (authService.rol() === 'admin') {
+            <a routerLink="/admin/reportes" routerLinkActive="activo">Reportes</a>
+            <a routerLink="/admin/salas" routerLinkActive="activo">Salas y usuarios</a>
+            <a routerLink="/admin/catalogo" routerLinkActive="activo">Catálogo</a>
             <a
               routerLink="/admin"
               routerLinkActive="activo"
@@ -28,11 +29,7 @@
               Películas
             </a>
 
-            <a
-              routerLink="/admin/funciones"
-              routerLinkActive="activo"
-              ariaCurrentWhenActive="page"
-            >
+            <a routerLink="/admin/funciones" routerLinkActive="activo" ariaCurrentWhenActive="page">
               Funciones
             </a>
           }
@@ -42,36 +39,20 @@
           </span>
 
           @if (authService.cargandoRol()) {
-            <span class="usuario" role="status">
-              Cargando perfil...
-            </span>
+            <span class="usuario" role="status"> Cargando perfil... </span>
           } @else if (authService.rol()) {
-            <span class="usuario">
-              Rol: {{ authService.rol() }}
-            </span>
+            <span class="usuario"> Rol: {{ authService.rol() }} </span>
           }
 
-          <button
-            type="button"
-            (click)="cerrarSesion()"
-            [disabled]="cerrandoSesion()"
-          >
+          <button type="button" (click)="cerrarSesion()" [disabled]="cerrandoSesion()">
             {{ cerrandoSesion() ? 'Cerrando...' : 'Cerrar sesión' }}
           </button>
         } @else {
-          <a
-            routerLink="/registro"
-            routerLinkActive="activo"
-            ariaCurrentWhenActive="page"
-          >
+          <a routerLink="/registro" routerLinkActive="activo" ariaCurrentWhenActive="page">
             Registrarse
           </a>
 
-          <a
-            routerLink="/login"
-            routerLinkActive="activo"
-            ariaCurrentWhenActive="page"
-          >
+          <a routerLink="/login" routerLinkActive="activo" ariaCurrentWhenActive="page">
             Iniciar sesión
           </a>
         }
@@ -87,6 +68,16 @@
     }
   </header>
 
+  @if (authService.usuario() && notificaciones().length > 0) {
+    <aside class="notificaciones" aria-label="Alertas de estreno" role="status">
+      @for (alerta of notificaciones(); track alerta.pelicula_id) {
+        <p>
+          ¡Ya abrió la venta de {{ alerta.nombre }}!
+          <a [routerLink]="['/cartelera', alerta.pelicula_id, 'funciones']">Ver horarios</a>
+        </p>
+      }
+    </aside>
+  }
   <main>
     <router-outlet></router-outlet>
   </main>

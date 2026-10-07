@@ -1,0 +1,36 @@
+section {
+  margin-top: 32px;
+}
+article {
+  padding: 16px;
+  margin: 12px 0;
+  background: #1d1d2b;
+  border-radius: 12px;
+}
+label {
+  display: block;
+  margin: 12px 0;
+}
+textarea,
+select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px;
+  font: inherit;
+  color: #f5f5fa;
+  background: #101018;
+  border: 1px solid #686880;
+  border-radius: 8px;
+}
+button {
+  padding: 12px 18px;
+  font: inherit;
+  background: #a99bff;
+  color: #101018;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.error {
+  color: #ffb4b4;
+}

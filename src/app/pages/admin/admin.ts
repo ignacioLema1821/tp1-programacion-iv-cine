@@ -9,7 +9,7 @@ import { PeliculasService } from '../../services/peliculas.service';
   standalone: true,
   imports: [FormsModule],
   templateUrl: './admin.html',
-  styleUrl: './admin.css'
+  styleUrl: './admin.css',
 })
 export class Admin implements OnInit {
   private peliculasService = inject(PeliculasService);
@@ -30,10 +30,19 @@ export class Admin implements OnInit {
   datos = {
     nombre: '',
     duracion: 90,
-    sinopsis: ''
+    sinopsis: '',
   };
 
   generosSeleccionados: number[] = [];
+  detalleId: number | null = null;
+  detalles = {
+    imagen: '',
+    edad: 0,
+    destacada: false,
+    estreno: '',
+    dias: 7,
+    precio: null as number | null,
+  };
 
   async ngOnInit(): Promise<void> {
     await this.cargarDatos();
@@ -60,9 +69,7 @@ export class Admin implements OnInit {
   cambiarGenero(generoId: number): void {
     if (this.generosSeleccionados.includes(generoId)) {
       // Si ya estaba seleccionado, lo quitamos.
-      this.generosSeleccionados = this.generosSeleccionados.filter(
-        id => id !== generoId
-      );
+      this.generosSeleccionados = this.generosSeleccionados.filter((id) => id !== generoId);
     } else {
       this.generosSeleccionados.push(generoId);
     }
@@ -74,7 +81,7 @@ export class Admin implements OnInit {
     this.datos = {
       nombre: pelicula.nombre,
       duracion: pelicula.duracion,
-      sinopsis: pelicula.sinopsis
+      sinopsis: pelicula.sinopsis,
     };
 
     // Copiamos los IDs para no modificar la lista original al editar.
@@ -92,7 +99,7 @@ export class Admin implements OnInit {
     this.datos = {
       nombre: '',
       duracion: 90,
-      sinopsis: ''
+      sinopsis: '',
     };
 
     this.generosSeleccionados = [];
@@ -108,24 +115,13 @@ export class Admin implements OnInit {
     this.mensajeError.set('');
     this.mensajeExito.set('');
 
-    if (
-      formulario.invalid ||
-      !this.datos.nombre.trim() ||
-      !this.datos.sinopsis.trim()
-    ) {
-      this.mensajeError.set(
-        'Completá el nombre, la duración y la sinopsis.'
-      );
+    if (formulario.invalid || !this.datos.nombre.trim() || !this.datos.sinopsis.trim()) {
+      this.mensajeError.set('Completá el nombre, la duración y la sinopsis.');
       return;
     }
 
-    if (
-      !Number.isInteger(this.datos.duracion) ||
-      this.datos.duracion <= 0
-    ) {
-      this.mensajeError.set(
-        'La duración debe ser un número entero mayor que cero.'
-      );
+    if (!Number.isInteger(this.datos.duracion) || this.datos.duracion <= 0) {
+      this.mensajeError.set('La duración debe ser un número entero mayor que cero.');
       return;
     }
 
@@ -142,7 +138,7 @@ export class Admin implements OnInit {
         this.datos.nombre,
         this.datos.duracion,
         this.datos.sinopsis,
-        this.generosSeleccionados
+        this.generosSeleccionados,
       );
 
       this.cancelarEdicion(formulario);
@@ -153,8 +149,42 @@ export class Admin implements OnInit {
     } catch (error) {
       console.error('Error al guardar la película:', error);
 
+      this.mensajeError.set('No pudimos guardar la película. Revisá los datos y tus permisos.');
+    } finally {
+      this.guardando.set(false);
+    }
+  }
+  cargarDetalles(): void {
+    const pelicula = this.peliculas().find((p) => p.id === this.detalleId);
+    if (!pelicula) return;
+    this.detalles = {
+      imagen: pelicula.imagen,
+      edad: pelicula.edad_minima,
+      destacada: pelicula.destacada,
+      estreno: pelicula.estreno || '',
+      dias: pelicula.dias_preventa,
+      precio: pelicula.precio_preventa,
+    };
+  }
+  async guardarDetalles(formulario: NgForm): Promise<void> {
+    if (!this.detalleId || formulario.invalid || this.guardando()) return;
+    this.guardando.set(true);
+    this.mensajeError.set('');
+    try {
+      await this.peliculasService.guardarDetalles(
+        this.detalleId,
+        this.detalles.imagen,
+        this.detalles.edad,
+        this.detalles.destacada,
+        this.detalles.estreno,
+        this.detalles.dias,
+        this.detalles.precio,
+      );
+      await this.cargarDatos();
+      this.mensajeExito.set('Detalles guardados.');
+    } catch (error) {
       this.mensajeError.set(
-        'No pudimos guardar la película. Revisá los datos y tus permisos.'
+        error instanceof Error ? error.message : 'No pudimos guardar los detalles.',
       );
     } finally {
       this.guardando.set(false);

@@ -1,0 +1,95 @@
+<section>
+  <h2>Salas, butacas y usuarios</h2>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (exito()) {
+    <p role="status">{{ exito() }}</p>
+  }
+  <form #fsala="ngForm" (ngSubmit)="guardarSala(fsala)">
+    <h3>{{ datos.id ? 'Editar sala' : 'Nueva sala' }}</h3>
+    <label>Nombre<input name="nombre" [(ngModel)]="datos.nombre" required maxlength="80" /></label>
+    <label
+      >Recargo VIP (%)<input
+        name="recargo"
+        type="number"
+        min="0.01"
+        max="999.99"
+        step="0.01"
+        [(ngModel)]="datos.recargo_vip"
+        required
+    /></label>
+    <label
+      ><input name="activa" type="checkbox" [(ngModel)]="datos.activa" /> Activa para nuevas
+      funciones</label
+    >
+    <button [disabled]="guardando()">Guardar sala</button>
+  </form>
+  <ul>
+    @for (sala of salas(); track sala.id) {
+      <li>
+        {{ sala.nombre }} · VIP {{ sala.recargo_vip }} %
+        <button (click)="editar(sala)">Editar</button>
+      </li>
+    }
+  </ul>
+  <h3>Distribución de butacas</h3>
+  <label
+    >Sala<select [(ngModel)]="salaId" (ngModelChange)="cargarButacas()">
+      <option [ngValue]="null">Seleccioná</option>
+      @for (sala of salas(); track sala.id) {
+        <option [ngValue]="sala.id">{{ sala.nombre }}</option>
+      }
+    </select></label
+  >
+  <p>No se pueden modificar butacas vendidas para funciones pendientes.</p>
+  <div class="butacas">
+    @for (b of butacas(); track b.id) {
+      <button (click)="elegirButaca(b)" [title]="b.tipo">{{ b.fila }}{{ b.numero }}</button>
+    }
+  </div>
+  @if (butaca(); as b) {
+    <form #fbutaca="ngForm" (ngSubmit)="guardarButaca(fbutaca)">
+      <label
+        >Fila<input name="fila" [(ngModel)]="b.fila" pattern="[A-JL-T]" required maxlength="1"
+      /></label>
+      <label
+        >Número<input
+          name="numero"
+          type="number"
+          min="1"
+          max="28"
+          step="1"
+          [(ngModel)]="b.numero"
+          required
+      /></label>
+      <label
+        >Bloque<select name="bloque" [(ngModel)]="b.bloque">
+          <option [ngValue]="1">Izquierdo</option>
+          <option [ngValue]="2">Central</option>
+          <option [ngValue]="3">Derecho</option>
+        </select></label
+      >
+      <label
+        >Tipo<select name="tipo" [(ngModel)]="b.tipo">
+          <option value="comun">Común</option>
+          <option value="accesible">Accesible</option>
+          <option value="vip">VIP</option>
+        </select></label
+      >
+      <button [disabled]="guardando()">Guardar butaca</button>
+    </form>
+  }
+  <h3>Roles de usuarios registrados</h3>
+  @for (usuario of usuarios(); track usuario.id) {
+    <div>
+      <span>{{ usuario.correo }}</span
+      ><select [(ngModel)]="usuario.rol" [attr.aria-label]="'Rol de ' + usuario.correo">
+        <option value="cliente">Cliente</option>
+        <option value="empleado">Empleado</option>
+        <option value="admin">Administrador</option>
+      </select>
+      <button (click)="guardarRol(usuario)" [disabled]="guardando()">Guardar rol</button>
+    </div>
+  }
+</section>

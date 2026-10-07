@@ -10,7 +10,7 @@ import { PeliculasService } from '../../services/peliculas.service';
   // FormsModule permite usar ngModel y RouterLink permite navegar.
   imports: [FormsModule, RouterLink],
   templateUrl: './cartelera.html',
-  styleUrl: './cartelera.css'
+  styleUrl: './cartelera.css',
 })
 export class Cartelera implements OnInit {
   private peliculasService = inject(PeliculasService);
@@ -20,8 +20,10 @@ export class Cartelera implements OnInit {
   cargando = signal(true);
   mensajeError = signal('');
 
+  fechaHoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' });
   busqueda = '';
   generoSeleccionado = '';
+  seccion = 'todas';
 
   async ngOnInit(): Promise<void> {
     await this.cargarPeliculas();
@@ -36,9 +38,7 @@ export class Cartelera implements OnInit {
       this.peliculas.set(peliculas);
     } catch (error) {
       console.error('Error al cargar la cartelera:', error);
-      this.mensajeError.set(
-        'No pudimos cargar las películas. Intentá nuevamente.'
-      );
+      this.mensajeError.set('No pudimos cargar las películas. Intentá nuevamente.');
     } finally {
       this.cargando.set(false);
     }
@@ -72,12 +72,16 @@ export class Cartelera implements OnInit {
       let coincideGenero = true;
 
       if (this.generoSeleccionado !== '') {
-        coincideGenero = pelicula.generos.includes(
-          this.generoSeleccionado
-        );
+        coincideGenero = pelicula.generos.includes(this.generoSeleccionado);
       }
 
-      if (coincideNombre && coincideGenero) {
+      const proximoEstreno = !!pelicula.estreno && pelicula.estreno > this.fechaHoy;
+      const coincideSeccion =
+        this.seccion === 'todas' ||
+        (this.seccion === 'proximamente' && proximoEstreno) ||
+        (this.seccion === 'actuales' && !proximoEstreno);
+
+      if (coincideNombre && coincideGenero && coincideSeccion) {
         resultado.push(pelicula);
       }
     }
@@ -88,5 +92,6 @@ export class Cartelera implements OnInit {
   limpiarFiltros(): void {
     this.busqueda = '';
     this.generoSeleccionado = '';
+    this.seccion = 'todas';
   }
 }

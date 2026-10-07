@@ -1,0 +1,181 @@
+<section>
+  <h2>Catálogo y beneficios</h2>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (exito()) {
+    <p class="exito" role="status">{{ exito() }}</p>
+  }
+  <form #fconfig="ngForm" (ngSubmit)="guardar('configuracion', fconfig)">
+    <h3>Beneficios generales</h3>
+    <label
+      >Descuento primera compra (%)<input
+        name="bienvenida"
+        type="number"
+        min="0"
+        max="100"
+        [(ngModel)]="config.descuento_bienvenida"
+        required
+    /></label>
+    <label
+      >Puntos por peso pagado<input
+        name="puntos"
+        type="number"
+        min="0"
+        max="1000"
+        [(ngModel)]="config.puntos_por_peso"
+        required
+    /></label>
+    <button [disabled]="guardando()">Guardar beneficios</button>
+  </form>
+  <form #fcat="ngForm" (ngSubmit)="guardar('categoria', fcat)">
+    <h3>Nueva categoría</h3>
+    <label
+      >Nombre<input name="nombre" [(ngModel)]="categoria.nombre" required maxlength="100"
+    /></label>
+    <button [disabled]="guardando()">Crear categoría</button>
+  </form>
+  <form #fproducto="ngForm" (ngSubmit)="guardar('producto', fproducto)">
+    <h3>{{ producto.id ? 'Editar producto' : 'Nuevo producto' }}</h3>
+    <label
+      >Nombre<input name="nombre" [(ngModel)]="producto.nombre" required maxlength="100"
+    /></label>
+    <label
+      >Categoría<select name="categoria" [(ngModel)]="producto.categoria_id" required>
+        <option [ngValue]="null">Seleccioná una categoría</option>
+        @for (categoria of categorias(); track categoria.id) {
+          <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+        }
+      </select></label
+    >
+    <label
+      >Precio<input
+        name="precio"
+        type="number"
+        min="0.01"
+        max="99999999.99"
+        step="0.01"
+        [(ngModel)]="producto.precio"
+        required
+    /></label>
+    <label><input name="activo" type="checkbox" [(ngModel)]="producto.activo" /> Disponible</label>
+    <button [disabled]="guardando()">Guardar producto</button>
+  </form>
+  <ul>
+    @for (p of productos(); track p.id) {
+      <li>
+        {{ p.nombre }} · ARS {{ p.precio }} · {{ p.activo ? 'Activo' : 'Inactivo' }}
+        <button (click)="editarProducto(p)">Editar</button>
+      </li>
+    }
+  </ul>
+  <form #fcombo="ngForm" (ngSubmit)="guardar('combo', fcombo)">
+    <h3>{{ combo.id ? 'Editar combo' : 'Nuevo combo: entrada + pochoclo + bebida' }}</h3>
+    <label>Nombre<input name="nombre" [(ngModel)]="combo.nombre" required /></label>
+    <label
+      >Precio fijo<input
+        name="precio"
+        type="number"
+        min="0.01"
+        step="0.01"
+        [(ngModel)]="combo.precio"
+        required
+    /></label>
+    <label
+      >Pochoclo<select name="pochoclo" [(ngModel)]="combo.pochoclo_id" required>
+        <option [ngValue]="null">Seleccioná</option>
+        @for (p of productos(); track p.id) {
+          <option [ngValue]="p.id">{{ p.nombre }}</option>
+        }
+      </select></label
+    >
+    <label
+      >Bebida<select name="bebida" [(ngModel)]="combo.bebida_id" required>
+        <option [ngValue]="null">Seleccioná</option>
+        @for (p of productos(); track p.id) {
+          <option [ngValue]="p.id">{{ p.nombre }}</option>
+        }
+      </select></label
+    >
+    <label><input name="activo" type="checkbox" [(ngModel)]="combo.activo" /> Disponible</label>
+    <button [disabled]="guardando()">Guardar combo</button>
+  </form>
+  <ul>
+    @for (c of combos(); track c.id) {
+      <li>{{ c.nombre }} · ARS {{ c.precio }} <button (click)="editarCombo(c)">Editar</button></li>
+    }
+  </ul>
+  <form #fcupon="ngForm" (ngSubmit)="guardar('cupon', fcupon)">
+    <h3>{{ cupon.id ? 'Editar cupón' : 'Nuevo cupón' }}</h3>
+    <label>Código<input name="codigo" [(ngModel)]="cupon.codigo" required maxlength="30" /></label>
+    <label
+      >Porcentaje<input
+        name="porcentaje"
+        type="number"
+        min="0.01"
+        max="100"
+        [(ngModel)]="cupon.porcentaje"
+        required
+    /></label>
+    <label
+      >Edad mínima (51 para mayores de 50)<input
+        name="edad"
+        type="number"
+        min="0"
+        max="120"
+        [(ngModel)]="cupon.edad_minima"
+        required
+    /></label>
+    <label><input name="activo" type="checkbox" [(ngModel)]="cupon.activo" /> Disponible</label>
+    <button [disabled]="guardando()">Guardar cupón</button>
+  </form>
+  <ul>
+    @for (c of cupones(); track c.id) {
+      <li>
+        {{ c.codigo }} · {{ c.porcentaje }} % · Desde {{ c.edad_minima }} años
+        <button (click)="editarCupon(c)">Editar</button>
+      </li>
+    }
+  </ul>
+  <form #frecompensa="ngForm" (ngSubmit)="guardar('recompensa', frecompensa)">
+    <h3>{{ recompensa.id ? 'Editar recompensa' : 'Nueva recompensa' }}</h3>
+    <label>Nombre<input name="nombre" [(ngModel)]="recompensa.nombre" required /></label>
+    <label
+      >Costo en puntos<input
+        name="costo"
+        type="number"
+        min="1"
+        step="1"
+        [(ngModel)]="recompensa.costo_puntos"
+        required
+    /></label>
+    <label
+      >Tipo<select name="tipo" [(ngModel)]="recompensa.tipo">
+        <option value="entrada">Entrada</option>
+        <option value="candy">Candy</option>
+      </select></label
+    >
+    @if (recompensa.tipo === 'candy') {
+      <label
+        >Producto<select name="producto" [(ngModel)]="recompensa.producto_id" required>
+          <option [ngValue]="null">Seleccioná</option>
+          @for (p of productos(); track p.id) {
+            <option [ngValue]="p.id">{{ p.nombre }}</option>
+          }
+        </select></label
+      >
+    }
+    <label
+      ><input name="activo" type="checkbox" [(ngModel)]="recompensa.activo" /> Disponible</label
+    >
+    <button [disabled]="guardando()">Guardar recompensa</button>
+  </form>
+  <ul>
+    @for (r of recompensas(); track r.id) {
+      <li>
+        {{ r.nombre }} · {{ r.costo_puntos }} puntos
+        <button (click)="editarRecompensa(r)">Editar</button>
+      </li>
+    }
+  </ul>
+</section>

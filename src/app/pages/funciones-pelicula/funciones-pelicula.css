@@ -173,3 +173,12 @@ dd {
 .boton-butacas:hover {
   background: #c0b5ff;
 }
+.poster {
+  width: 160px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+}
+a[hidden] {
+  display: none;
+}

@@ -10,6 +10,12 @@ export interface Funcion {
   precio_base: number;
 
   // La consulta también traerá los nombres relacionados.
-  pelicula: { nombre: string } | null;
+  pelicula: {
+    nombre: string;
+    estreno?: string | null;
+    dias_preventa?: number;
+    precio_preventa?: number | null;
+    edad_minima?: number;
+  } | null;
   sala: { nombre: string } | null;
 }

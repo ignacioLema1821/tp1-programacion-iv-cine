@@ -11,9 +11,7 @@
     <div role="alert">
       <p class="error">{{ errorCarga() }}</p>
 
-      <button type="button" (click)="cargarDatos()">
-        Reintentar
-      </button>
+      <button type="button" (click)="cargarDatos()">Reintentar</button>
     </div>
   } @else {
     <form #formulario="ngForm" (ngSubmit)="guardarPelicula(formulario)">
@@ -25,13 +23,7 @@
         <legend>Datos de la película</legend>
 
         <label for="nombre">Nombre</label>
-        <input
-          id="nombre"
-          name="nombre"
-          type="text"
-          [(ngModel)]="datos.nombre"
-          required
-        />
+        <input id="nombre" name="nombre" type="text" [(ngModel)]="datos.nombre" required />
 
         <label for="duracion">Duración en minutos</label>
         <input
@@ -94,7 +86,9 @@
     @if (peliculas().length > 0) {
       <div class="tabla-contenedor">
         <table>
-          <caption>Listado de películas</caption>
+          <caption>
+            Listado de películas
+          </caption>
 
           <thead>
             <tr>
@@ -131,3 +125,51 @@
     }
   }
 </section>
+<form #fdetalles="ngForm" (ngSubmit)="guardarDetalles(fdetalles)">
+  <h3>Imagen, edad mínima y preventa</h3>
+  <label
+    >Película<select
+      name="pelicula"
+      [(ngModel)]="detalleId"
+      (ngModelChange)="cargarDetalles()"
+      required
+    >
+      <option [ngValue]="null">Seleccioná una película</option>
+      @for (p of peliculas(); track p.id) {
+        <option [ngValue]="p.id">{{ p.nombre }}</option>
+      }
+    </select></label
+  >
+  <label>URL de imagen o ruta local<input name="imagen" [(ngModel)]="detalles.imagen" /></label>
+  <label
+    >Edad mínima<select name="edad" [(ngModel)]="detalles.edad">
+      <option [ngValue]="0">Sin restricción</option>
+      <option [ngValue]="13">13 años</option>
+      <option [ngValue]="18">18 años</option>
+    </select></label
+  >
+  <label
+    ><input name="destacada" type="checkbox" [(ngModel)]="detalles.destacada" /> Destacar en
+    cartelera</label
+  >
+  <label>Estreno<input name="estreno" type="date" [(ngModel)]="detalles.estreno" /></label>
+  <label
+    >Días de preventa<input
+      name="dias"
+      type="number"
+      min="0"
+      max="90"
+      step="1"
+      [(ngModel)]="detalles.dias"
+      required
+  /></label>
+  <label
+    >Precio especial de preventa (opcional)<input
+      name="precio"
+      type="number"
+      min="0.01"
+      step="0.01"
+      [(ngModel)]="detalles.precio"
+  /></label>
+  <button [disabled]="guardando()">Guardar detalles</button>
+</form>

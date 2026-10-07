@@ -242,3 +242,8 @@ tbody tr:last-child td {
     width: 100%;
   }
 }
+input[type='checkbox'] {
+  width: auto;
+  padding: 0;
+  margin-right: 8px;
+}

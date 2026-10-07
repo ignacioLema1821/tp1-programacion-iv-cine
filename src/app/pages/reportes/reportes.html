@@ -1,0 +1,96 @@
+<section>
+  <h2>Reportes y actividad</h2>
+  <form #formulario="ngForm" (ngSubmit)="cargar(formulario)">
+    <label>Desde<input name="desde" type="date" [(ngModel)]="desde" required /></label>
+    <label
+      >Hasta<input name="hasta" type="date" [(ngModel)]="hasta" [min]="desde" required
+    /></label>
+    <button [disabled]="cargando()">Consultar</button>
+  </form>
+  <button (click)="periodo(7)" [disabled]="cargando()">Últimos 7 días</button>
+  <button (click)="periodo(30)" [disabled]="cargando()">Últimos 30 días</button>
+  <button (click)="excel()" [disabled]="cargando() || exportando()">Exportar Excel</button>
+  <button (click)="pdf()" [disabled]="cargando() || exportando()">Exportar PDF</button>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (cargando()) {
+    <p role="status">Consultando...</p>
+  }
+  <p>Facturación de compras vigentes: ARS {{ totalFacturado() }}. Los pagos son simulados.</p>
+  <div class="tabla">
+    <table>
+      <caption>
+        Facturación por día
+      </caption>
+      <thead>
+        <tr>
+          <th>Día</th>
+          <th>Facturación</th>
+          <th>Entradas</th>
+          <th>Pago simulado</th>
+          <th>Crédito</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (dia of reporte().diario; track dia.dia) {
+          <tr>
+            <td>{{ dia.dia }}</td>
+            <td>ARS {{ dia.facturacion }}</td>
+            <td>{{ dia.entradas }}</td>
+            <td>ARS {{ dia.pago_simulado }}</td>
+            <td>ARS {{ dia.credito }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5">Sin ventas en este período.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <h3>Películas más vistas en el período</h3>
+  <p>Contamos las entradas validadas de funciones dentro del período seleccionado.</p>
+  @for (p of reporte().peliculas; track p.pelicula) {
+    <div class="grafico">
+      <p>{{ p.pelicula }} · {{ p.vistas }} vistas · {{ p.entradas }} vendidas</p>
+      <div class="barra" [style.width.%]="ancho(p.vistas)"></div>
+    </div>
+  }
+  <h3>Candy más vendido</h3>
+  <ul>
+    @for (p of reporte().candy; track p.nombre) {
+      <li>{{ p.nombre }} · {{ p.cantidad }} unidades</li>
+    } @empty {
+      <li>Sin ventas de candy.</li>
+    }
+  </ul>
+  <h3>Últimas 100 actividades</h3>
+  <div class="tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Usuario</th>
+          <th>Acción</th>
+          <th>Detalle</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of actividad(); track a.id) {
+          <tr>
+            <td>{{ a.fecha | date: 'dd/MM/yyyy HH:mm' : '-0300' }}</td>
+            <td>{{ a.usuario_id || 'Compra anónima o inicialización' }}</td>
+            <td>{{ a.accion }}</td>
+            <td>
+              <details>
+                <summary>Ver detalle</summary>
+                <pre>{{ a.detalle }}</pre>
+              </details>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

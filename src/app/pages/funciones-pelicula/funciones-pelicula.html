@@ -1,7 +1,30 @@
 <section>
-  <a class="volver" routerLink="/cartelera">
-    ← Volver a la cartelera
-  </a>
+  @if (pelicula(); as datos) {
+    <img
+      class="poster"
+      [src]="datos.imagen || '/posters/default.svg'"
+      [alt]="'Póster de ' + datos.nombre"
+    />
+    <p>
+      Edad mínima: {{ datos.edad_minima === 0 ? 'Sin restricción' : datos.edad_minima + ' años' }}
+    </p>
+    @if (datos.estreno) {
+      <p>
+        Estreno: {{ datos.estreno }} · Preventa desde {{ datos.dias_preventa }} días antes.
+        @if (datos.precio_preventa) {
+          Precio de preventa: ARS {{ datos.precio_preventa }}.
+        }
+      </p>
+      <button type="button" (click)="activarAlerta()">Activar alerta de venta</button>
+    }
+  }
+  @if (aviso()) {
+    <p role="status">{{ aviso() }}</p>
+  }
+  @if (!ventaAbierta()) {
+    <p>La venta todavía no abrió. Podés activar una alerta.</p>
+  }
+  <a class="volver" routerLink="/cartelera"> ← Volver a la cartelera </a>
 
   @if (cargando()) {
     <p role="status">Cargando funciones...</p>
@@ -9,9 +32,7 @@
     <div class="error" role="alert">
       <p>{{ mensajeError() }}</p>
 
-      <button type="button" (click)="cargarDatos()">
-        Reintentar
-      </button>
+      <button type="button" (click)="cargarDatos()">Reintentar</button>
     </div>
   } @else if (pelicula(); as peliculaActual) {
     <header class="encabezado">
@@ -32,20 +53,16 @@
         <p>Horarios de Argentina (UTC−3). Precios expresados en pesos.</p>
       </div>
 
-      <button type="button" (click)="cargarDatos()">
-        Actualizar horarios
-      </button>
+      <button type="button" (click)="cargarDatos()">Actualizar horarios</button>
     </div>
 
     <!-- Cada tarjeta corresponde a una proyección de esta película. -->
     <div class="funciones">
       @for (funcion of funciones(); track funcion.id) {
         <article class="funcion">
-          <h4>{{ funcion.inicio | date:'dd/MM/yyyy':'-0300' }}</h4>
+          <h4>{{ funcion.inicio | date: 'dd/MM/yyyy' : '-0300' }}</h4>
 
-          <p class="hora">
-            {{ funcion.inicio | date:'HH:mm':'-0300' }} h
-          </p>
+          <p class="hora">{{ funcion.inicio | date: 'HH:mm' : '-0300' }} h</p>
 
           <dl>
             <div>
@@ -68,7 +85,7 @@
             <div>
               <dt>Finaliza</dt>
               <dd>
-                {{ funcion.fin | date:'dd/MM/yyyy HH:mm':'-0300' }}
+                {{ funcion.fin | date: 'dd/MM/yyyy HH:mm' : '-0300' }}
               </dd>
             </div>
           </dl>
@@ -81,6 +98,7 @@
           <!-- Enviamos el ID de la función para cargar su sala y sus butacas. -->
           <a
             class="boton-butacas"
+            [hidden]="!ventaAbierta()"
             [routerLink]="['/funciones', funcion.id, 'butacas']"
           >
             Elegir butacas
@@ -88,10 +106,12 @@
         </article>
       } @empty {
         <p class="sin-funciones" role="status">
-          Esta película todavía no tiene funciones próximas.
-          Volvé a consultar más adelante.
+          Esta película todavía no tiene funciones próximas. Volvé a consultar más adelante.
         </p>
       }
     </div>
+  }
+  @if (pelicula(); as datos) {
+    <app-resenas [peliculaId]="datos.id"></app-resenas>
   }
 </section>

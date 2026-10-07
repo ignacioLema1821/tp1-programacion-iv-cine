@@ -3,7 +3,7 @@ import { Butaca, FuncionConRecargo } from '../models/butaca';
 import { SupabaseService } from './supabase.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ButacasService {
   private supabaseService = inject(SupabaseService);
@@ -11,7 +11,8 @@ export class ButacasService {
   async obtenerFuncion(id: number): Promise<FuncionConRecargo | null> {
     const respuesta = await this.supabaseService.cliente
       .from('funciones')
-      .select(`
+      .select(
+        `
         id,
         pelicula_id,
         sala_id,
@@ -21,9 +22,10 @@ export class ButacasService {
         formato,
         idioma,
         precio_base,
-        pelicula:peliculas(nombre),
+        pelicula:peliculas(nombre, estreno, dias_preventa, precio_preventa, edad_minima),
         sala:salas(nombre, recargo_vip)
-      `)
+      `,
+      )
       .eq('id', id)
       .maybeSingle<FuncionConRecargo>();
 
@@ -32,7 +34,18 @@ export class ButacasService {
     }
 
     // Si el administrador eliminó la función, el resultado será null.
-    return respuesta.data;
+    const funcion = respuesta.data;
+    const hoy = new Date().toLocaleDateString('en-CA', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+    });
+    if (
+      funcion?.pelicula?.estreno &&
+      funcion.pelicula.estreno > hoy &&
+      funcion.pelicula.precio_preventa
+    ) {
+      funcion.precio_base = funcion.pelicula.precio_preventa;
+    }
+    return funcion;
   }
 
   async obtenerButacas(salaId: number): Promise<Butaca[]> {
